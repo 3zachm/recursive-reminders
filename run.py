@@ -61,6 +61,7 @@ async def stop(ctx):
         await ctx.send(embed=embed)
 
 async def timer(ctx, t, user, rq):
+    userA = ctx.message.author
     index = return2DIndex(user, remindList, 0)
     while(remindList[index][1] == rq):
         await asyncio.sleep(t)
@@ -72,8 +73,8 @@ async def timer(ctx, t, user, rq):
                     description='Do **!stop** to cancel current and further reminders',
                     timestamp = ctx.message.created_at,
                     color=0x000000)
-                embed.set_footer(text=user.name, icon_url=user.avatar_url)
-                await ctx.send("<@!" + str(user) + ">", embed=embed)
+                embed.set_footer(text=userA.name, icon_url=userA.avatar_url)
+                await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
     index = return2DIndex(0, remindList, 0)
     remindList.pop(index)
 
