@@ -2,7 +2,6 @@ import datetime
 import discord
 import configparser
 import io
-import time
 import asyncio
 from discord.ext import commands, tasks
 from datetime import date
