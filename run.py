@@ -1,10 +1,19 @@
 import datetime
 import discord
-import configparser
+import configparser, os
 import io
 import asyncio
+from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
+
+config = configparser.ConfigParser()
+
+if not os.path.exists('config.ini'):
+    config['discord'] = {'token': ''}
+    config.write(open('config.ini', 'w'))
+    print('Config generated. Please edit it with your token.')
+    quit()
 
 with open("config.ini") as c:
     discord_config = c.read()
