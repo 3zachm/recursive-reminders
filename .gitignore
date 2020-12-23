@@ -1,4 +1,5 @@
-.vscode/
 .pytest/
 .pytest_cache/
+.vscode/
+config.ini
 env/
