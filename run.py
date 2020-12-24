@@ -8,14 +8,15 @@ from discord.ext import commands, tasks
 from datetime import date
 
 config = configparser.ConfigParser()
+dn = os.path.dirname(os.path.realpath(__file__))
 
-if not os.path.exists('config.ini'):
+if not os.path.exists(dn + '/config.ini'):
     config['discord'] = {'token': ''}
-    config.write(open('config.ini', 'w'))
+    config.write(open(dn + '/config.ini', 'w'))
     print('Config generated. Please edit it with your token.')
     quit()
 
-with open("config.ini") as c:
+with open(dn + "/config.ini") as c:
     discord_config = c.read()
 config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
@@ -51,19 +52,18 @@ async def remindme(ctx, t):
 async def stop(ctx):
     user = ctx.message.author
     if user.id in (i[0] for i in remindList):
-        i = [i for i in remindList if user.id in i][0]
-        index = remindList.index(i)
+        index = return2DIndex(user.id, remindList, 0)
         remindList[index][0] = 0
         embed=discord.Embed(
             title="Your reminder was cancelled",
             timestamp = ctx.message.created_at,
-            color=0x6f02cf)
+            color=0xcc0000)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
     else:
         embed=discord.Embed(
             title='You have no reminder in progress',
-            description='One can be made with **!remind [minutes]**',
+            description='One can be made with **!remindme [minutes]**',
             timestamp = ctx.message.created_at,
             color=0x6f02cf)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -86,6 +86,8 @@ async def timer(ctx, t, user, rq):
                 await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
     index = return2DIndex(0, remindList, 0)
     remindList.pop(index)
+
+#TODO help command, command exceptions
 
 def return2DIndex(key, arr, in2D):
     i = [i for i in arr if key in i][in2D]
