@@ -2,4 +2,5 @@
 .pytest_cache/
 .vscode/
 config.ini
+prefixes.json
 env/

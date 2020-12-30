@@ -3,6 +3,7 @@ import discord
 import configparser, os
 import io
 import asyncio
+import json
 from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
@@ -15,16 +16,61 @@ if not os.path.exists(dn + '/config.ini'):
     config.write(open(dn + '/config.ini', 'w'))
     print('Config generated. Please edit it with your token.')
     quit()
+if not os.path.exists(dn + '/prefixes.json'):
+    with open('prefixes.json', 'w') as p:
+        json.dump({}, p)
 
 with open(dn + "/config.ini") as c:
     discord_config = c.read()
 config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
 
+defaultPrefix = '!'
+
+def initPrefix(id):
+    with open('prefixes.json', 'r') as p:
+        prefixes = json.load(p)
+    prefixes[str(id)] = defaultPrefix
+    with open('prefixes.json', 'w') as p:
+        json.dump(prefixes, p, indent=4)
+
+def get_prefix(bot, message):
+    with open('prefixes.json', 'r') as p:
+        prefixes = json.load(p)
+    try:
+        pfx = prefixes[str(message.guild.id)]
+    except:
+        initPrefix(message.guild.id)
+        with open('prefixes.json', 'r') as p:
+            prefixes = json.load(p)
+        pfx = prefixes[str(message.guild.id)]
+    return pfx
+
 botToken = config.get('discord', 'token')
-bot = commands.Bot(command_prefix = '!')
+bot = commands.Bot(command_prefix = get_prefix)
 requestNum = 0
 remindList = []
+
+@bot.event
+async def on_guild_join(guild):
+    initPrefix(guild.id)
+
+@bot.command(name="prefix")
+@commands.has_permissions(administrator=True)
+async def prefix(ctx, prefix):
+    with open('prefixes.json', 'r') as p:
+        prefixes = json.load(p)
+    prefixes[str(ctx.guild.id)] = prefix
+    with open('prefixes.json', 'w') as p:
+        json.dump(prefixes, p, indent=4)
+    user = ctx.message.author
+    embed=discord.Embed(
+            title="Success!",
+            description="Prefix changed to " + prefix,
+            timestamp = ctx.message.created_at,
+            color=0x00CC66)
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    await ctx.send(embed=embed)
 
 @bot.command(name="remindme")
 async def remindme(ctx, t):
