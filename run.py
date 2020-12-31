@@ -73,18 +73,42 @@ async def on_ready():
 async def on_guild_join(guild):
     initPrefix(guild.id)
 
+@bot.event
+async def on_message(message):
+    ctx = await bot.get_context(message)
+    msg = message.content
+    if bot.user.mentioned_in(message):
+        if ' ' in msg:
+            index = msg.index(' ')
+            await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
+        else:
+            pfx = str(get_prefix(bot=bot, message=message))
+            if pfx == '':
+                pfx = 'None'
+            embed=discord.Embed(
+                title="My prefix is ``" + pfx + "`` for this guild",
+                description="If you have prefix conflicts, mention me followed by a new prefix!" + 
+                "\nOnly single letter prefixes can be applied this way for exception reasons",
+                #timestamp = ctx.message.created_at,
+                color=0x00CC66)
+            #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+            await ctx.send(embed=embed)
+    await bot.process_commands(message)
+
 @bot.command(name="prefix")
 @commands.has_permissions(administrator=True)
-async def prefix(ctx, prefix):
+async def prefix(ctx, prefix): # add prefix check through prefix only
     with open('prefixes.json', 'r') as r:
         prefixes = json.load(r)
     prefixes[str(ctx.guild.id)] = prefix
     with open('prefixes.json', 'w') as w:
         json.dump(prefixes, w, indent=4)
     user = ctx.message.author
+    if prefix == '':
+        prefix = 'None'
     embed=discord.Embed(
             title="Success!",
-            description="Prefix changed to " + prefix,
+            description="Prefix changed to ``" + prefix + "``",
             #timestamp = ctx.message.created_at,
             color=0x00CC66)
     #embed.set_footer(text=user.name, icon_url=user.avatar_url)
