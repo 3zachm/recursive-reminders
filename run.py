@@ -9,47 +9,65 @@ from discord.ext import commands, tasks
 from datetime import date
 
 config = configparser.ConfigParser()
+# script location
 dn = os.path.dirname(os.path.realpath(__file__))
 
+# generate empty config files
 if not os.path.exists(dn + '/config.ini'):
-    config['discord'] = {'token': ''}
+    config['discord'] = {'token': '', 'default_prefix': '!'}
     config.write(open(dn + '/config.ini', 'w'))
     print('Config generated. Please edit it with your token.')
     quit()
 if not os.path.exists(dn + '/prefixes.json'):
-    with open('prefixes.json', 'w') as p:
-        json.dump({}, p)
+    with open('prefixes.json', 'w') as w:
+        json.dump({}, w)
 
+# open config file
 with open(dn + "/config.ini") as c:
     discord_config = c.read()
 config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
 
-defaultPrefix = '!'
+defaultPrefix = config.get('discord', 'default_prefix')
+requestNum = 0
+remindList = []
 
+# initializes a server in the prefix file
 def initPrefix(id):
-    with open('prefixes.json', 'r') as p:
-        prefixes = json.load(p)
+    with open('prefixes.json', 'r') as r:
+        prefixes = json.load(r)
     prefixes[str(id)] = defaultPrefix
-    with open('prefixes.json', 'w') as p:
-        json.dump(prefixes, p, indent=4)
+    with open('prefixes.json', 'w') as w:
+        json.dump(prefixes, w, indent=4)
 
 def get_prefix(bot, message):
-    with open('prefixes.json', 'r') as p:
-        prefixes = json.load(p)
+    if not message.guild:
+        return ""
+    with open('prefixes.json', 'r') as r:
+        prefixes = json.load(r)
     try:
         pfx = prefixes[str(message.guild.id)]
     except:
         initPrefix(message.guild.id)
-        with open('prefixes.json', 'r') as p:
-            prefixes = json.load(p)
+        with open('prefixes.json', 'r') as r:
+            prefixes = json.load(r)
         pfx = prefixes[str(message.guild.id)]
     return pfx
 
 botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
-requestNum = 0
-remindList = []
+
+@bot.event
+async def on_ready():
+    print('Running...')
+    if not hasattr(bot, 'appinfo'):
+        bot.appinfo = await bot.application_info()
+    # generate bot owner
+    if not os.path.exists(dn + '/owners.json'):
+        ids = {"DISCORD_IDS": []}
+        ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, 'id': bot.appinfo.owner.id})
+        with open('owners.json', 'w') as w:
+            json.dump(ids, w, indent=4)
 
 @bot.event
 async def on_guild_join(guild):
@@ -58,11 +76,11 @@ async def on_guild_join(guild):
 @bot.command(name="prefix")
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, prefix):
-    with open('prefixes.json', 'r') as p:
-        prefixes = json.load(p)
+    with open('prefixes.json', 'r') as r:
+        prefixes = json.load(r)
     prefixes[str(ctx.guild.id)] = prefix
-    with open('prefixes.json', 'w') as p:
-        json.dump(prefixes, p, indent=4)
+    with open('prefixes.json', 'w') as w:
+        json.dump(prefixes, w, indent=4)
     user = ctx.message.author
     embed=discord.Embed(
             title="Success!",
@@ -115,6 +133,7 @@ async def stop(ctx):
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
 
+# sort of inefficient? should invoke a cancel in the stop command too
 async def timer(ctx, t, user, rq):
     userA = ctx.message.author
     index = return2DIndex(user, remindList, 0)
