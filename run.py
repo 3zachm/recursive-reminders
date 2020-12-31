@@ -85,9 +85,9 @@ async def prefix(ctx, prefix):
     embed=discord.Embed(
             title="Success!",
             description="Prefix changed to " + prefix,
-            timestamp = ctx.message.created_at,
+            #timestamp = ctx.message.created_at,
             color=0x00CC66)
-    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    #embed.set_footer(text=user.name, icon_url=user.avatar_url)
     await ctx.send(embed=embed)
 
 @bot.command(name="remindme")
@@ -99,14 +99,14 @@ async def remindme(ctx, t):
         embed=discord.Embed(
             title='You already have a reminder in progress',
             color=0xcc0000)
-        embed.set_footer(text=user.name, icon_url=user.avatar_url)
+        #embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
     else:
         requestNum += 1
         remindList.append([user.id, requestNum])
         embed=discord.Embed(
             title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-            description='Do **!stop** to cancel current and further reminders',
+            description='Do **' + str(get_prefix(bot=bot, message=ctx.message)) +'stop** to cancel current and further reminders',
             timestamp = ctx.message.created_at, color = 0x00CC66)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
@@ -120,14 +120,14 @@ async def stop(ctx):
         remindList[index][0] = 0
         embed=discord.Embed(
             title="Your reminder was cancelled",
-            timestamp = ctx.message.created_at,
+            #timestamp = ctx.message.created_at,
             color=0xcc0000)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
     else:
         embed=discord.Embed(
             title='You have no reminder in progress',
-            description='One can be made with **!remindme [minutes]**',
+            description='One can be made with **' + get_prefix(bot=bot, message=ctx.message) +'remindme [minutes]**',
             timestamp = ctx.message.created_at,
             color=0x6f02cf)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -144,7 +144,7 @@ async def timer(ctx, t, user, rq):
             if remindList[index][1] == rq:
                 embed=discord.Embed(
                     title=str(int(t/60)) + " minutes are up!",
-                    description='Do **!stop** to cancel current and further reminders',
+                    description='Do **' + get_prefix(bot=bot, message=ctx.message) +'stop** to cancel current and further reminders',
                     timestamp = ctx.message.created_at,
                     color=0x000000)
                 embed.set_footer(text=userA.name, icon_url=userA.avatar_url)
@@ -152,7 +152,7 @@ async def timer(ctx, t, user, rq):
     index = return2DIndex(0, remindList, 0)
     remindList.pop(index)
 
-#TODO help command, command exceptions
+#TODO help command, command exceptions, pretty embeds, owner commands
 
 def return2DIndex(key, arr, in2D):
     i = [i for i in arr if key in i][in2D]
