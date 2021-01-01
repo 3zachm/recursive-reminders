@@ -77,22 +77,26 @@ async def on_guild_join(guild):
 async def on_message(message):
     ctx = await bot.get_context(message)
     msg = message.content
-    if bot.user.mentioned_in(message):
-        if ' ' in msg:
-            index = msg.index(' ')
-            await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
-        else:
-            pfx = str(get_prefix(bot=bot, message=message))
-            if pfx == '':
-                pfx = 'None'
-            embed=discord.Embed(
-                title="My prefix is ``" + pfx + "`` for this guild",
-                description="If you have prefix conflicts, mention me followed by a new prefix!" + 
-                "\nOnly single letter prefixes can be applied this way for exception reasons",
-                #timestamp = ctx.message.created_at,
-                color=0x00CC66)
-            #embed.set_footer(text=user.name, icon_url=user.avatar_url)
-            await ctx.send(embed=embed)
+    try: # make cleaner later >.>
+        if bot.user.mentioned_in(message):
+            if message.mentions[0] == bot.user:
+                if ' ' in msg:
+                    index = msg.index(' ')
+                    await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
+                else:
+                    pfx = str(get_prefix(bot=bot, message=message))
+                    if pfx == '':
+                        pfx = 'None'
+                    embed=discord.Embed(
+                        title="My prefix is ``" + pfx + "`` for this guild",
+                        description="If you have prefix conflicts, mention me followed by a new prefix!" + 
+                        "\nOnly single letter prefixes can be applied this way for exception reasons",
+                        #timestamp = ctx.message.created_at,
+                        color=0x00CC66)
+                    #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+                    await ctx.send(embed=embed)
+    except:
+        pass
     await bot.process_commands(message)
 
 @bot.command(name="prefix")
