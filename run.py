@@ -1,6 +1,7 @@
 import datetime
 import discord
-import configparser, os
+import configparser
+import os
 import io
 import asyncio
 import json
@@ -29,14 +30,12 @@ config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
 
 defaultPrefix = config.get('discord', 'default_prefix')
-requestNum = 0
-remindList = []
 
 # initializes a server in the prefix file
-def initPrefix(id):
+def initPrefix(serverID):
     with open('prefixes.json', 'r') as r:
         prefixes = json.load(r)
-    prefixes[str(id)] = defaultPrefix
+    prefixes[str(serverID)] = defaultPrefix
     with open('prefixes.json', 'w') as w:
         json.dump(prefixes, w, indent=4)
 
@@ -47,7 +46,7 @@ def get_prefix(bot, message):
         prefixes = json.load(r)
     try:
         pfx = prefixes[str(message.guild.id)]
-    except:
+    except KeyError:
         initPrefix(message.guild.id)
         with open('prefixes.json', 'r') as r:
             prefixes = json.load(r)
@@ -56,6 +55,8 @@ def get_prefix(bot, message):
 
 botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
+bot.requestNum = 0
+remindList = []
 
 @bot.event
 async def on_ready():
@@ -77,26 +78,27 @@ async def on_guild_join(guild):
 async def on_message(message):
     ctx = await bot.get_context(message)
     msg = message.content
-    try: # make cleaner later >.>
-        if bot.user.mentioned_in(message):
-            if message.mentions[0] == bot.user:
-                if ' ' in msg:
-                    index = msg.index(' ')
-                    await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
-                else:
-                    pfx = str(get_prefix(bot=bot, message=message))
-                    if pfx == '':
-                        pfx = 'None'
-                    embed=discord.Embed(
-                        title="My prefix is ``" + pfx + "`` for this guild",
-                        description="If you have prefix conflicts, mention me followed by a new prefix!" + 
-                        "\nOnly single letter prefixes can be applied this way for exception reasons",
-                        #timestamp = ctx.message.created_at,
-                        color=0x00CC66)
-                    #embed.set_footer(text=user.name, icon_url=user.avatar_url)
-                    await ctx.send(embed=embed)
-    except:
-        pass
+    if (bot.user.mentioned_in(message)):
+        if message.mentions[0] == bot.user:
+            try:
+                firstMention = msg[0 : msg.index(' ')]
+            except ValueError:
+                firstMention = ''
+            if firstMention == (f'<@!{bot.user.id}>'): # if mention is first and has space
+                index = msg.index(' ')
+                await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
+            else:
+                pfx = str(get_prefix(bot=bot, message=message))
+                if pfx == '':
+                    pfx = 'None'
+                embed=discord.Embed(
+                    title="My prefix is ``" + pfx + "`` for this guild",
+                    description="If you have prefix conflicts, mention me followed by a new prefix!" + 
+                    "\nOnly single letter prefixes can be applied this way for exception reasons",
+                    #timestamp = ctx.message.created_at,
+                    color=0x00CC66)
+                #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+                await ctx.send(embed=embed)
     await bot.process_commands(message)
 
 @bot.command(name="prefix")
@@ -120,7 +122,6 @@ async def prefix(ctx, prefix): # add prefix check through prefix only
 
 @bot.command(name="remindme")
 async def remindme(ctx, t):
-    global requestNum
     t = int(t) * 60
     user = ctx.message.author
     if user.id in (i[0] for i in remindList):
@@ -130,15 +131,15 @@ async def remindme(ctx, t):
         #embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
     else:
-        requestNum += 1
-        remindList.append([user.id, requestNum])
+        bot.requestNum += 1
+        remindList.append([user.id, bot.requestNum])
         embed=discord.Embed(
             title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
             description='Do **' + str(get_prefix(bot=bot, message=ctx.message)) +'stop** to cancel current and further reminders',
             timestamp = ctx.message.created_at, color = 0x00CC66)
         embed.set_footer(text=user.name, icon_url=user.avatar_url)
         await ctx.send(embed=embed)
-        timer_task = asyncio.create_task(timer(ctx, t, user.id, requestNum))
+        timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum))
 
 @bot.command(name="stop")
 async def stop(ctx):
@@ -179,8 +180,6 @@ async def timer(ctx, t, user, rq):
                 await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
     index = return2DIndex(0, remindList, 0)
     remindList.pop(index)
-
-#TODO help command, command exceptions, pretty embeds, owner commands
 
 def return2DIndex(key, arr, in2D):
     i = [i for i in arr if key in i][in2D]
