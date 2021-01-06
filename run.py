@@ -84,7 +84,7 @@ async def on_message(message):
                 firstMention = msg[0 : msg.index(' ')]
             except ValueError:
                 firstMention = ''
-            if firstMention == (f'<@!{bot.user.id}>'): # if mention is first and has space
+            if firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: # if mention is first and has space
                 index = msg.index(' ')
                 await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
             else:
