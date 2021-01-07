@@ -5,31 +5,51 @@ import os
 import io
 import asyncio
 import json
+import logging
+import time
 from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
 
 config = configparser.ConfigParser()
 # script location
-dn = os.path.dirname(os.path.realpath(__file__))
+script_location = os.path.dirname(os.path.realpath(__file__))
 
 # generate empty config files
-if not os.path.exists(dn + '/config.ini'):
+if not os.path.exists(script_location + '/config.ini'):
     config['discord'] = {'token': '', 'default_prefix': '!'}
-    config.write(open(dn + '/config.ini', 'w'))
+    config['python'] = {'generate_logs': True}
+    config.write(open(script_location + '/config.ini', 'w'))
     print('Config generated. Please edit it with your token.')
     quit()
-if not os.path.exists(dn + '/prefixes.json'):
+if not os.path.exists(script_location + '/prefixes.json'):
     with open('prefixes.json', 'w') as w:
         json.dump({}, w)
 
 # open config file
-with open(dn + "/config.ini") as c:
+with open(script_location + '/config.ini') as c:
     discord_config = c.read()
 config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
 
-defaultPrefix = config.get('discord', 'default_prefix')
+try:
+    defaultPrefix = config.get('discord', 'default_prefix')
+    generateLogs = config.getboolean('python', 'generate_logs')
+except (configparser.NoSectionError, configparser.NoOptionError) as e:
+    print(e)
+    print("Ensure config file has all entries present. If you recently pulled an update, consider regenerating the config")
+    quit()
+
+#logging
+if generateLogs:
+    logsLocation = script_location + '/logs/'
+    if not os.path.exists(logsLocation):
+        os.mkdir(logsLocation)
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler(filename=script_location + '/logs/' + time.strftime("%Y-%m-%d-%H%M%S") + '.log', encoding='utf-8', mode='w')
+    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+    logger.addHandler(handler)
 
 # initializes a server in the prefix file
 def initPrefix(serverID):
@@ -64,7 +84,7 @@ async def on_ready():
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
     # generate bot owner
-    if not os.path.exists(dn + '/owners.json'):
+    if not os.path.exists(script_location + '/owners.json'):
         ids = {"DISCORD_IDS": []}
         ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, 'id': bot.appinfo.owner.id})
         with open('owners.json', 'w') as w:

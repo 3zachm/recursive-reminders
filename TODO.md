@@ -10,7 +10,9 @@ Keeping track of what needs to be done :)
     - [x] Fix CodeFactor issues
 - [ ] Split code into readable folders/files
     - [ ] Embed generator
-- [ ] Logging
+    - [ ] File manager
+    - [ ] Log manager
+- [x] Logging Functionality
 - [ ] Adaptable help menu
 - [ ] Multiple timers
     - [ ] unique IDs rather than simply an array order

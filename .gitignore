@@ -5,3 +5,4 @@ config.ini
 prefixes.json
 owners.json
 env/
+logs/
