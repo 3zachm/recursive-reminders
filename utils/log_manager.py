@@ -17,5 +17,5 @@ def exception(e, logger):
     logger.error(str(repr(e)))
     logger.exception(e)
 
-def log(str, logger):
-    logger.info(str)
+def log(s, logger):
+    logger.info(s)
