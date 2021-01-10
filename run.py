@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from datetime import date
 import utils.embed_generator as embeds
 import utils.file_manager as files
+import utils.log_manager as logs
 
 config = configparser.ConfigParser()
 # script location
@@ -37,14 +38,7 @@ except (configparser.NoSectionError, configparser.NoOptionError) as e:
 
 #logging
 if generateLogs:
-    logsLocation = script_location + '/logs/'
-    if not os.path.exists(logsLocation):
-        os.mkdir(logsLocation)
-    logger = logging.getLogger('discord')
-    logger.setLevel(logging.INFO)
-    handler = logging.FileHandler(filename=script_location + '/logs/' + time.strftime("%Y-%m-%d-%H%M%S") + '.log', encoding='utf-8', mode='w')
-    handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-    logger.addHandler(handler)
+    logger = logs.init_logs(script_location + '/logs/')
 
 # initializes a server in the prefix file
 def initPrefix(serverID):
@@ -84,6 +78,7 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     initPrefix(guild.id)
+    logs.log("Joined \"" + guild.name + "\" - " + str(guild.id), logger)
 
 @bot.event
 async def on_message(message):
