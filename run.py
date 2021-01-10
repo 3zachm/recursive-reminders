@@ -11,21 +11,15 @@ from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
 import utils.embed_generator as embeds
+import utils.file_manager as files
 
 config = configparser.ConfigParser()
 # script location
 script_location = os.path.dirname(os.path.realpath(__file__))
 
 # generate empty config files
-if not os.path.exists(script_location + '/config.ini'):
-    config['discord'] = {'token': '', 'default_prefix': '!'}
-    config['python'] = {'generate_logs': True}
-    config.write(open(script_location + '/config.ini', 'w'))
-    print('Config generated. Please edit it with your token.')
-    quit()
-if not os.path.exists(script_location + '/prefixes.json'):
-    with open('prefixes.json', 'w') as w:
-        json.dump({}, w)
+files.make_config(script_location + '/config.ini')
+files.make_prefixes(script_location + '/prefixes.json')
 
 # open config file
 with open(script_location + '/config.ini') as c:
@@ -85,11 +79,7 @@ async def on_ready():
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
     # generate bot owner
-    if not os.path.exists(script_location + '/owners.json'):
-        ids = {"DISCORD_IDS": []}
-        ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, 'id': bot.appinfo.owner.id})
-        with open('owners.json', 'w') as w:
-            json.dump(ids, w, indent=4)
+    files.make_owners(script_location + '/owners.json', bot)
 
 @bot.event
 async def on_guild_join(guild):
