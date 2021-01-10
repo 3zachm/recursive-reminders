@@ -10,6 +10,7 @@ import time
 from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
+import utils.embed_generator as embeds
 
 config = configparser.ConfigParser()
 # script location
@@ -111,13 +112,7 @@ async def on_message(message):
                 pfx = str(get_prefix(bot=bot, message=message))
                 if pfx == '':
                     pfx = 'None'
-                embed=discord.Embed(
-                    title="My prefix is ``" + pfx + "`` for this guild",
-                    description="If you have prefix conflicts, mention me followed by a new prefix!" + 
-                    "\nOnly single letter prefixes can be applied this way for exception reasons",
-                    #timestamp = ctx.message.created_at,
-                    color=0x00CC66)
-                #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+                embed = embeds.prefix_current(ctx, guild_prefix(ctx))
                 await ctx.send(embed=embed)
     await bot.process_commands(message)
 
@@ -132,12 +127,7 @@ async def prefix(ctx, prefix): # add prefix check through prefix only
     user = ctx.message.author
     if prefix == '':
         prefix = 'None'
-    embed=discord.Embed(
-            title="Success!",
-            description="Prefix changed to ``" + prefix + "``",
-            #timestamp = ctx.message.created_at,
-            color=0x00CC66)
-    #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    embed = embeds.prefix_change(ctx, prefix)
     await ctx.send(embed=embed)
 
 @bot.command(name="remindme")
@@ -145,19 +135,12 @@ async def remindme(ctx, t):
     t = int(t) * 60
     user = ctx.message.author
     if user.id in (i[0] for i in remindList):
-        embed=discord.Embed(
-            title='You already have a reminder in progress',
-            color=0xcc0000)
-        #embed.set_footer(text=user.name, icon_url=user.avatar_url)
+        embed = embeds.in_progress(ctx)
         await ctx.send(embed=embed)
     else:
         bot.requestNum += 1
         remindList.append([user.id, bot.requestNum])
-        embed=discord.Embed(
-            title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-            description='Do **' + str(get_prefix(bot=bot, message=ctx.message)) +'stop** to cancel current and further reminders',
-            timestamp = ctx.message.created_at, color = 0x00CC66)
-        embed.set_footer(text=user.name, icon_url=user.avatar_url)
+        embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
         await ctx.send(embed=embed)
         timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum))
 
@@ -167,36 +150,22 @@ async def stop(ctx):
     if user.id in (i[0] for i in remindList):
         index = return2DIndex(user.id, remindList, 0)
         remindList[index][0] = 0
-        embed=discord.Embed(
-            title="Your reminder was cancelled",
-            #timestamp = ctx.message.created_at,
-            color=0xcc0000)
-        embed.set_footer(text=user.name, icon_url=user.avatar_url)
+        embed = embeds.reminder_cancel(ctx)
         await ctx.send(embed=embed)
     else:
-        embed=discord.Embed(
-            title='You have no reminder in progress',
-            description='One can be made with **' + get_prefix(bot=bot, message=ctx.message) +'remindme [minutes]**',
-            timestamp = ctx.message.created_at,
-            color=0x6f02cf)
-        embed.set_footer(text=user.name, icon_url=user.avatar_url)
+        embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
 
 # sort of inefficient? should invoke a cancel in the stop command too
 async def timer(ctx, t, user, rq):
-    userA = ctx.message.author
+    userA = ctx.message.author # needs different name, lazy
     index = return2DIndex(user, remindList, 0)
     while(remindList[index][1] == rq):
         await asyncio.sleep(t)
         if user in (i[0] for i in remindList):
             index = return2DIndex(user, remindList, 0)
             if remindList[index][1] == rq:
-                embed=discord.Embed(
-                    title=str(int(t/60)) + " minutes are up!",
-                    description='Do **' + get_prefix(bot=bot, message=ctx.message) +'stop** to cancel current and further reminders',
-                    timestamp = ctx.message.created_at,
-                    color=0x000000)
-                embed.set_footer(text=userA.name, icon_url=userA.avatar_url)
+                embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
                 await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
     index = return2DIndex(0, remindList, 0)
     remindList.pop(index)
@@ -204,5 +173,9 @@ async def timer(ctx, t, user, rq):
 def return2DIndex(key, arr, in2D):
     i = [i for i in arr if key in i][in2D]
     return arr.index(i)
+
+# offhand because discord.py needs get_prefix to have args
+def guild_prefix(ctx):
+    return get_prefix(bot=bot, message=ctx.message)
 
 bot.run(botToken)

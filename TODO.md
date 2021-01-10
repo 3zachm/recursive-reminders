@@ -9,7 +9,7 @@ Keeping track of what needs to be done :)
 - [x] Improve code quality
     - [x] Fix CodeFactor issues
 - [ ] Split code into readable folders/files
-    - [ ] Embed generator
+    - [x] Embed generator
     - [ ] File manager
     - [ ] Log manager
 - [x] Logging Functionality
