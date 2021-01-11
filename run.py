@@ -21,7 +21,6 @@ script_location = os.path.dirname(os.path.realpath(__file__))
 # generate empty config files
 files.make_config(script_location + '/config.ini')
 files.make_prefixes(script_location + '/prefixes.json')
-files.make_dir(script_location + '/requests/')
 
 # open config file
 with open(script_location + '/config.ini') as c:
