@@ -24,4 +24,7 @@ def make_owners(path, bot):
         with open(path, 'w') as w:
             json.dump(ids, w, indent=4)
 
+def make_dir(path):
+    if not os.path.exists(path):
+        os.mkdir(path)
 # consider moving other writing operations here at the end of dev

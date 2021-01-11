@@ -1,11 +1,10 @@
 import logging
 import time
 import os
+import utils.file_manager as files
 
 def init_logs(path):
-    logsLocation = path
-    if not os.path.exists(logsLocation):
-        os.mkdir(logsLocation)
+    files.make_dir(path)
     logger = logging.getLogger('discord')
     logger.setLevel(logging.INFO)
     handler = logging.FileHandler(filename=path + time.strftime("%Y-%m-%d-%H%M%S") + '.log', encoding='utf-8', mode='w')
