@@ -4,7 +4,7 @@ Keeping track of what needs to be done :)
 
 # indev
 
-## 1/5/2021 -> x
+## 1/5/2021 -> 1/10/2021
 
 - [x] Improve code quality
     - [x] Fix CodeFactor issues
@@ -13,10 +13,13 @@ Keeping track of what needs to be done :)
     - [x] File manager
     - [x] Log manager
 - [x] Logging Functionality
-- [ ] Adaptable help menu
+
+## 1/11/2021 -> x 
+(timer rewrite)
 - [ ] Multiple timers
     - [ ] unique IDs rather than simply an array order
-    - [ ] json files instead of 2D array?
+    - [ ] json files instead of 2D array
+- [ ] Adaptable help menu
 - [ ] UI Overall
     - [ ] Console output
     - [ ] Embeds

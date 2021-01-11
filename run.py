@@ -1,4 +1,5 @@
 import datetime
+from asyncio.coroutines import coroutine
 import discord
 import configparser
 import os
@@ -13,6 +14,8 @@ from datetime import date
 import utils.embed_generator as embeds
 import utils.file_manager as files
 import utils.log_manager as logs
+import utils.request_manager as requests
+import utils.utils as utils
 
 config = configparser.ConfigParser()
 # script location
@@ -66,6 +69,7 @@ botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
 bot.requestNum = 0
 remindList = []
+coroutineList = []
 
 @bot.event
 async def on_ready():
@@ -127,13 +131,15 @@ async def remindme(ctx, t):
         remindList.append([user.id, bot.requestNum])
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
         await ctx.send(embed=embed)
-        timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum))
+        timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum), name=str(ctx.message.id))
+        requests.create(script_location + '/requests/', user.id, ctx.message.id, t)
+        coroutineList.append([ctx.message.id, timer_task])
 
 @bot.command(name="stop")
 async def stop(ctx):
     user = ctx.message.author
     if user.id in (i[0] for i in remindList):
-        index = return2DIndex(user.id, remindList, 0)
+        index = utils.return2DIndex(user.id, remindList, 0)
         remindList[index][0] = 0
         embed = embeds.reminder_cancel(ctx)
         await ctx.send(embed=embed)
@@ -141,23 +147,23 @@ async def stop(ctx):
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
 
-# sort of inefficient? should invoke a cancel in the stop command too
+# DEBUG COMMAND
+@bot.command(name="remove")
+async def remove(ctx, request):
+    requests.remove(int(request), coroutineList)
+
 async def timer(ctx, t, user, rq):
     userA = ctx.message.author # needs different name, lazy
-    index = return2DIndex(user, remindList, 0)
+    index = utils.return2DIndex(user, remindList, 0)
     while(remindList[index][1] == rq):
         await asyncio.sleep(t)
         if user in (i[0] for i in remindList):
-            index = return2DIndex(user, remindList, 0)
+            index = utils.return2DIndex(user, remindList, 0)
             if remindList[index][1] == rq:
                 embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
                 await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
-    index = return2DIndex(0, remindList, 0)
+    index = utils.return2DIndex(0, remindList, 0)
     remindList.pop(index)
-
-def return2DIndex(key, arr, in2D):
-    i = [i for i in arr if key in i][in2D]
-    return arr.index(i)
 
 # offhand because discord.py needs get_prefix to have args
 def guild_prefix(ctx):

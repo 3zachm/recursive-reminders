@@ -21,10 +21,13 @@ def make_owners(path, bot):
     if not os.path.exists(path):
         ids = {"DISCORD_IDS": []}
         ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, 'id': bot.appinfo.owner.id})
-        with open(path, 'w') as w:
-            json.dump(ids, w, indent=4)
+        make_json(path, ids)
 
 def make_dir(path):
     if not os.path.exists(path):
         os.mkdir(path)
+
+def make_json(path, data):
+    with open(path, 'w') as w:
+        json.dump(data, w, indent=4)
 # consider moving other writing operations here at the end of dev
