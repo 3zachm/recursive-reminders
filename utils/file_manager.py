@@ -2,6 +2,7 @@ import configparser
 import os
 import io
 import json
+import glob
 
 def make_config(path):
     config = configparser.ConfigParser()
@@ -30,4 +31,10 @@ def make_dir(path):
 def make_json(path, data):
     with open(path, 'w') as w:
         json.dump(data, w, indent=4)
+
+def get_files(key, path):
+    arr = []
+    for file in glob.glob(path + str(key) + '*.json'):
+        arr.append(file)
+    return arr
 # consider moving other writing operations here at the end of dev

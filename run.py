@@ -18,7 +18,6 @@ import utils.request_manager as requests
 import utils.utils as utils
 
 config = configparser.ConfigParser()
-# script location
 script_location = os.path.dirname(os.path.realpath(__file__))
 
 # generate empty config files
@@ -69,7 +68,7 @@ botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
 bot.requestNum = 0
 remindList = []
-coroutineList = []
+bot.coroutineList = []
 
 @bot.event
 async def on_ready():
@@ -133,7 +132,12 @@ async def remindme(ctx, t):
         await ctx.send(embed=embed)
         timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum), name=str(ctx.message.id))
         requests.create(script_location + '/requests/', user.id, ctx.message.id, t)
-        coroutineList.append([ctx.message.id, timer_task])
+        bot.coroutineList.append([ctx.message.id, timer_task])
+
+@bot.command(name="remindlist")
+async def remindlist(ctx):
+    tempList = files.get_files(ctx.message.author.id, script_location + '/requests/')
+    await ctx.send(tempList)
 
 @bot.command(name="stop")
 async def stop(ctx):
@@ -150,7 +154,7 @@ async def stop(ctx):
 # DEBUG COMMAND
 @bot.command(name="remove")
 async def remove(ctx, request):
-    requests.remove(int(request), coroutineList)
+    requests.remove(int(request), bot.coroutineList)
 
 async def timer(ctx, t, user, rq):
     userA = ctx.message.author # needs different name, lazy

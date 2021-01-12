@@ -15,4 +15,3 @@ def create(loc, userid, request, time):
 def remove(request, arr):
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
     timer_task.cancel()
-
