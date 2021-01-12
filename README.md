@@ -1,6 +1,8 @@
 ## recursive-reminders
 [![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders)
 
+``rewrite`` branch in-progress, will eventually replace master because it's going to be a lot better and have more features c:
+
 WIP! Actually fleshing this out, will be hosted publically when deemed stable enough.\
 Global default prefix is ! but can be changed in generated config.
 
