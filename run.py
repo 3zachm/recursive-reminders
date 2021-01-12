@@ -44,22 +44,22 @@ if generateLogs:
 
 # initializes a server in the prefix file
 def initPrefix(serverID):
-    with open('prefixes.json', 'r') as r:
+    with open(script_location + '/prefixes.json', 'r') as r:
         prefixes = json.load(r)
     prefixes[str(serverID)] = defaultPrefix
-    with open('prefixes.json', 'w') as w:
+    with open(script_location + '/prefixes.json', 'w') as w:
         json.dump(prefixes, w, indent=4)
 
 def get_prefix(bot, message):
     if not message.guild:
         return ""
-    with open('prefixes.json', 'r') as r:
+    with open(script_location + '/prefixes.json', 'r') as r:
         prefixes = json.load(r)
     try:
         pfx = prefixes[str(message.guild.id)]
     except KeyError:
         initPrefix(message.guild.id)
-        with open('prefixes.json', 'r') as r:
+        with open(script_location + '/prefixes.json', 'r') as r:
             prefixes = json.load(r)
         pfx = prefixes[str(message.guild.id)]
     return pfx
@@ -107,10 +107,10 @@ async def on_message(message):
 @bot.command(name="prefix")
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, prefix): # add prefix check through prefix only
-    with open('prefixes.json', 'r') as r:
+    with open(script_location + '/prefixes.json', 'r') as r:
         prefixes = json.load(r)
     prefixes[str(ctx.guild.id)] = prefix
-    with open('prefixes.json', 'w') as w:
+    with open(script_location + '/prefixes.json', 'w') as w:
         json.dump(prefixes, w, indent=4)
     user = ctx.message.author
     if prefix == '':
@@ -136,8 +136,11 @@ async def remindme(ctx, t):
 
 @bot.command(name="remindlist")
 async def remindlist(ctx):
-    tempList = files.get_files(ctx.message.author.id, script_location + '/requests/')
-    await ctx.send(tempList)
+    requests_list = requests.get_requests(ctx.message.author.id, script_location + '/requests/')
+    temp_list = []
+    for rq in requests_list:
+        temp_list.append(rq['request'])
+    await ctx.send(temp_list)
 
 @bot.command(name="stop")
 async def stop(ctx):

@@ -15,3 +15,12 @@ def create(loc, userid, request, time):
 def remove(request, arr):
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
     timer_task.cancel()
+
+def get_requests(userid, path):
+    request_list = []
+    request_files = files.get_files(userid, path)
+    for file in request_files:
+        with open(file, 'r') as r:
+            request = json.load(r)
+        request_list.append(request)
+    return request_list

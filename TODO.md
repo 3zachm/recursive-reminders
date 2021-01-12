@@ -23,3 +23,4 @@ Keeping track of what needs to be done :)
 - [ ] UI Overall
     - [ ] Console output
     - [ ] Embeds
+- [ ] Use file manager to create common names (prefix.json, other config files)
