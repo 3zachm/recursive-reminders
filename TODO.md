@@ -16,11 +16,11 @@ Keeping track of what needs to be done :)
 
 ## 1/11/2021 -> x 
 (timer rewrite)
-- [ ] Multiple timers
-    - [ ] unique IDs rather than simply an array order
-    - [ ] json files instead of 2D array
-- [ ] Adaptable help menu
+- [x] Multiple timers
+    - [x] unique IDs rather than simply an array order
+    - [x] json files instead of 2D array
 - [ ] UI Overall
     - [ ] Console output
     - [ ] Embeds
 - [ ] Use file manager to create common names (prefix.json, other config files)
+- [ ] Adaptable help menu

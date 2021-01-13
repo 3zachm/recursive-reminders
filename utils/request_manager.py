@@ -12,13 +12,14 @@ def create(loc, userid, request, time):
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
 
 # CURRENTLY DEBUG--Actually replace the array system -midnight zach
-def remove(request, arr):
+def remove(path, request, arr):
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
     timer_task.cancel()
+    files.delete_json(path, request)
 
-def get_requests(userid, path):
+def retrieve(userid, path):
     request_list = []
-    request_files = files.get_files(userid, path)
+    request_files = files.get_json(userid, path)
     for file in request_files:
         with open(file, 'r') as r:
             request = json.load(r)

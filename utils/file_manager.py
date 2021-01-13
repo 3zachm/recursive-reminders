@@ -32,7 +32,12 @@ def make_json(path, data):
     with open(path, 'w') as w:
         json.dump(data, w, indent=4)
 
-def get_files(key, path):
+def delete_json(path, rq):
+    for file in glob.glob(path + '*' + str(rq) + '.json'):
+        if os.path.exists(file):
+            os.remove(file)
+
+def get_json(key, path):
     arr = []
     for file in glob.glob(path + str(key) + '*.json'):
         arr.append(file)

@@ -66,8 +66,6 @@ def get_prefix(bot, message):
 
 botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
-bot.requestNum = 0
-remindList = []
 bot.coroutineList = []
 
 @bot.event
@@ -122,55 +120,38 @@ async def prefix(ctx, prefix): # add prefix check through prefix only
 async def remindme(ctx, t):
     t = int(t) * 60
     user = ctx.message.author
-    if user.id in (i[0] for i in remindList):
-        embed = embeds.in_progress(ctx)
-        await ctx.send(embed=embed)
-    else:
-        bot.requestNum += 1
-        remindList.append([user.id, bot.requestNum])
-        embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
-        await ctx.send(embed=embed)
-        timer_task = asyncio.create_task(timer(ctx, t, user.id, bot.requestNum), name=str(ctx.message.id))
-        requests.create(script_location + '/requests/', user.id, ctx.message.id, t)
-        bot.coroutineList.append([ctx.message.id, timer_task])
+    requests.create(script_location + '/requests/', user.id, ctx.message.id, t)
+    embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
+    await ctx.send(embed=embed)
+    timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
+    bot.coroutineList.append([ctx.message.id, timer_task])
 
 @bot.command(name="remindlist")
 async def remindlist(ctx):
-    requests_list = requests.get_requests(ctx.message.author.id, script_location + '/requests/')
+    requests_list = requests.retrieve(ctx.message.author.id, script_location + '/requests/')
     temp_list = []
     for rq in requests_list:
         temp_list.append(rq['request'])
     await ctx.send(temp_list)
 
 @bot.command(name="stop")
-async def stop(ctx):
+async def stop(ctx, request):
     user = ctx.message.author
-    if user.id in (i[0] for i in remindList):
-        index = utils.return2DIndex(user.id, remindList, 0)
-        remindList[index][0] = 0
-        embed = embeds.reminder_cancel(ctx)
-        await ctx.send(embed=embed)
-    else:
+    if requests.retrieve(user.id, script_location + '/requests/') == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
+    else:
+        requests.remove(script_location + '/requests/', int(request), bot.coroutineList)
+        embed = embeds.reminder_cancel(ctx)
+        await ctx.send(embed=embed)
 
-# DEBUG COMMAND
-@bot.command(name="remove")
-async def remove(ctx, request):
-    requests.remove(int(request), bot.coroutineList)
-
-async def timer(ctx, t, user, rq):
-    userA = ctx.message.author # needs different name, lazy
-    index = utils.return2DIndex(user, remindList, 0)
-    while(remindList[index][1] == rq):
+# add information for embed
+async def timer(ctx, rq, t):
+    user = ctx.message.author
+    while(True):
         await asyncio.sleep(t)
-        if user in (i[0] for i in remindList):
-            index = utils.return2DIndex(user, remindList, 0)
-            if remindList[index][1] == rq:
-                embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
-                await ctx.send("<@!" + str(userA.id) + ">", embed=embed)
-    index = utils.return2DIndex(0, remindList, 0)
-    remindList.pop(index)
+        embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
+        await ctx.send("<@!" + str(user.id) + ">", embed=embed)
 
 # offhand because discord.py needs get_prefix to have args
 def guild_prefix(ctx):
