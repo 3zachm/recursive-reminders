@@ -23,6 +23,7 @@ script_location = os.path.dirname(os.path.realpath(__file__))
 # generate empty config files
 files.make_config(script_location + '/config.ini')
 files.make_prefixes(script_location + '/prefixes.json')
+files.make_dir(script_location + '/requests/')
 
 # open config file
 with open(script_location + '/config.ini') as c:
@@ -117,10 +118,10 @@ async def prefix(ctx, prefix): # add prefix check through prefix only
     await ctx.send(embed=embed)
 
 @bot.command(name="remindme")
-async def remindme(ctx, t):
+async def remindme(ctx, t, *, rqname):
     t = int(t) * 60
     user = ctx.message.author
-    requests.create(script_location + '/requests/', user.id, ctx.message.id, t)
+    requests.create(script_location + '/requests/', user.id, ctx.message.id, rqname, t)
     embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
     await ctx.send(embed=embed)
     timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
@@ -128,20 +129,18 @@ async def remindme(ctx, t):
 
 @bot.command(name="remindlist")
 async def remindlist(ctx):
-    requests_list = requests.retrieve(ctx.message.author.id, script_location + '/requests/')
-    temp_list = []
-    for rq in requests_list:
-        temp_list.append(rq['request'])
-    await ctx.send(temp_list)
+    requests_list = requests.retrieve_list(ctx.message.author.id, script_location + '/requests/')
+    embed = embeds.reminder_list(ctx, requests_list)
+    await ctx.send(embed=embed)
 
 @bot.command(name="stop")
 async def stop(ctx, request):
     user = ctx.message.author
-    if requests.retrieve(user.id, script_location + '/requests/') == []:
+    if requests.retrieve_list(user.id, script_location + '/requests/') == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
     else:
-        requests.remove(script_location + '/requests/', int(request), bot.coroutineList)
+        requests.remove(user.id, script_location + '/requests/', int(request), bot.coroutineList)
         embed = embeds.reminder_cancel(ctx)
         await ctx.send(embed=embed)
 

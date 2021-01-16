@@ -1,5 +1,6 @@
 import discord
 from discord import Embed
+import utils.utils as utils
 
 empty = Embed.Empty
 
@@ -40,6 +41,26 @@ def reminder_none(ctx, pfx):
         timestamp = ctx.message.created_at,
         color=0x6f02cf)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+def reminder_list(ctx, rqs):
+    user = ctx.message.author
+    rqPages = list(utils.split_array(rqs, 10))
+    embed_pages = []
+    # a single embed
+    embed=discord.Embed(
+        title="**Reminders**",
+        description="All your active reminders are shown below")
+    embed.set_author(name=user.name, icon_url=user.avatar_url)
+    embed.set_footer(text="Page 1/" + str(len(rqPages)))
+    try:
+        temprq = rqPages[0]
+    except IndexError:
+        return embed
+    i = 1
+    for rq in temprq:
+        embed.add_field(name="#" + str(i) + " | " + rq['name'], value="Length: " + str(rq['time']/60) + "m", inline=False)
+        i += 1
     return embed
 
 def timer_end(ctx, pfx, t):
