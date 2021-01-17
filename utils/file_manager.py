@@ -15,8 +15,7 @@ def make_config(path):
 
 def make_prefixes(path):
     if not os.path.exists(path):
-        with open(path, 'w') as w:
-            json.dump({}, w)
+        make_json(path, {})
 
 def make_owners(path, bot):
     if not os.path.exists(path):
