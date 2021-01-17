@@ -11,7 +11,6 @@ def create(loc, userid, request, rqname, time):
     data = {"user": userid, "request": request, "name": rqname, "time": time}
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
 
-# CURRENTLY DEBUG--Actually replace the array system -midnight zach
 def remove(userid, path, request, arr):
     request = retrieve(userid, path, request)
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
