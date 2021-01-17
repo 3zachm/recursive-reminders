@@ -130,8 +130,7 @@ async def remindme(ctx, t, *, rqname):
 @bot.command(name="remindlist")
 async def remindlist(ctx):
     requests_list = requests.retrieve_list(ctx.message.author.id, script_location + '/requests/')
-    embed = embeds.reminder_list(ctx, requests_list)
-    await ctx.send(embed=embed)
+    await embeds.reminder_list(ctx, requests_list)
 
 @bot.command(name="stop")
 async def stop(ctx, request):

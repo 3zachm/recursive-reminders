@@ -19,8 +19,14 @@ Keeping track of what needs to be done :)
 - [x] Multiple timers
     - [x] unique IDs rather than simply an array order
     - [x] json files instead of 2D array
+- [ ] Command Exceptions
+- [ ] Set request limits (name/time/description lengths)
 - [ ] UI Overall
     - [ ] Console output
     - [ ] Embeds
 - [ ] Use file manager to create common names (prefix.json, other config files)
 - [ ] Adaptable help menu
+
+## Long-term
+
+- [ ] Logging/Support Server (log in a private support server)

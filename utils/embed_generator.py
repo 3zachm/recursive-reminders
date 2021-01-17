@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord import Embed
 import utils.utils as utils
@@ -43,25 +44,42 @@ def reminder_none(ctx, pfx):
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
-def reminder_list(ctx, rqs):
+async def reminder_list(ctx, rqs):
     user = ctx.message.author
-    rqPages = list(utils.split_array(rqs, 10))
-    embed_pages = []
-    # a single embed
-    embed=discord.Embed(
-        title="**Reminders**",
-        description="All your active reminders are shown below")
-    embed.set_author(name=user.name, icon_url=user.avatar_url)
-    embed.set_footer(text="Page 1/" + str(len(rqPages)))
-    try:
-        temprq = rqPages[0]
-    except IndexError:
-        return embed
-    i = 1
-    for rq in temprq:
-        embed.add_field(name="#" + str(i) + " | " + rq['name'], value="Length: " + str(rq['time']/60) + "m", inline=False)
-        i += 1
-    return embed
+    rq_pages = list(utils.split_array(rqs, 5))
+    embed_list = []
+    page_count = 0
+    rq_number = 1
+    # make more efficient embed
+    if len(rq_pages) == 0:
+        embed=discord.Embed(
+           title="**Reminders**",
+           description="You have no active reminders" 
+        )
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        embed.set_footer(text="Page 0/0")
+        await ctx.send(embed=embed)
+        return
+    for page in rq_pages:
+        embed=discord.Embed(
+            title="**Reminders**",
+            description="All your active reminders are shown below")
+        embed.set_author(name=user.name, icon_url=user.avatar_url)
+        embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(rq_pages)))
+        try:
+            rq_page = page
+        except IndexError:
+            # handle no reminders
+            return embed
+        for rq in rq_page:
+            embed.add_field(
+                name="#" + str(rq_number) + " | " + rq['name'], 
+                value="Length: " + str(rq['time']/60) + "m", 
+                inline=False)
+            rq_number += 1
+        embed_list.append(embed)
+        page_count += 1
+    await embed_pages(ctx, embed_list)
 
 def timer_end(ctx, pfx, t):
     user = ctx.message.author
@@ -87,3 +105,43 @@ def prefix_change(ctx, pfx):
         description="Prefix changed to ``" + pfx + "``",
         color=0x00CC66)
     return embed
+
+async def embed_pages(ctx, pages):
+    bot = ctx.bot
+    pg = 0
+    reaction = None
+    message = await ctx.send(embed = pages[pg])
+    await message.add_reaction('⏮')
+    await message.add_reaction('◀')
+    await message.add_reaction('▶')
+    await message.add_reaction('⏭')
+
+    def check(react, user):
+        return user == ctx.author
+
+    while(True):
+        if str(reaction) == '⏮':
+            pg = 0
+            await message.edit(embed = pages[pg])
+        elif str(reaction) == '◀':
+            if pg > 0:
+                pg -= 1
+                await message.edit(embed = pages[pg])
+        elif str(reaction) == '▶':
+            if pg < len(pages) - 1:
+                pg += 1
+                await message.edit(embed = pages[pg])
+        elif str(reaction) == '⏭':
+            pg = len(pages) - 1
+            await message.edit(embed = pages[pg])
+        
+        try:
+            reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
+            await message.remove_reaction(reaction, user)
+        except:
+            break
+    try:
+        await message.clear_reactions()
+    except discord.Forbidden:
+        # replace with smthn formal
+        await ctx.send("I don't have permission to remove reactions :(\nPlease make sure I have the ``Manage Message`` permission")
