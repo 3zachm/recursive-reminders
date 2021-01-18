@@ -1,5 +1,4 @@
 import datetime
-
 import discord
 import configparser
 import os
@@ -116,7 +115,7 @@ async def on_message(message):
 
 @bot.command(name="prefix")
 @commands.has_permissions(administrator=True)
-async def prefix(ctx, prefix=None): # add prefix check through prefix only
+async def prefix(ctx, prefix=None):
     if prefix is None:
         embed = embeds.prefix_current(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed) 
