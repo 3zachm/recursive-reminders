@@ -4,6 +4,7 @@ from discord import Embed
 import utils.utils as utils
 
 empty = Embed.Empty
+all_control_emoji = ["⏮", "◀", "▶", "⏭"]
 
 def general_embed(title = empty, description = empty, timestamp = empty, color = empty, footer_text = empty, footer_icon_url = empty):
     embed=Embed(
@@ -42,6 +43,12 @@ def reminder_none(ctx, pfx):
         timestamp = ctx.message.created_at,
         color=0x6f02cf)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+def request_length(ctx, var, length):
+    embed=discord.Embed(
+        title="That " + var + " name is too long :(",
+        description="Try to keep it under or equal to " + length + "!")
     return embed
 
 async def reminder_list(ctx, rqs):
@@ -106,42 +113,54 @@ def prefix_change(ctx, pfx):
         color=0x00CC66)
     return embed
 
+def prefix_dms(ctx):
+    embed=discord.Embed(
+        title="I have no prefix for DMs!",
+        description="Simply send the command keyword like ``help``")
+    return embed
+
+def prefix_length(ctx):
+    embed=discord.Embed(
+        title="That prefix is too long",
+        description="Anyhing less than 10 characters is more reasonable c:")
+    return embed
+
 async def embed_pages(ctx, pages):
     bot = ctx.bot
     pg = 0
     reaction = None
     message = await ctx.send(embed = pages[pg])
-    await message.add_reaction('⏮')
-    await message.add_reaction('◀')
-    await message.add_reaction('▶')
-    await message.add_reaction('⏭')
+    for emoji in all_control_emoji:
+        await message.add_reaction(emoji)
 
-    def check(react, user):
-        return user == ctx.author
+    def check(reaction, user):
+        return reaction.message.id == message.id and user == ctx.author
 
     while(True):
         if str(reaction) == '⏮':
             pg = 0
-            await message.edit(embed = pages[pg])
+            await reaction.message.edit(embed = pages[pg])
         elif str(reaction) == '◀':
             if pg > 0:
                 pg -= 1
-                await message.edit(embed = pages[pg])
+                await reaction.message.edit(embed = pages[pg])
         elif str(reaction) == '▶':
             if pg < len(pages) - 1:
                 pg += 1
-                await message.edit(embed = pages[pg])
+                await reaction.message.edit(embed = pages[pg])
         elif str(reaction) == '⏭':
             pg = len(pages) - 1
-            await message.edit(embed = pages[pg])
+            await reaction.message.edit(embed = pages[pg])
         
         try:
             reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
-            await message.remove_reaction(reaction, user)
-        except:
+            if ctx.guild is not None:
+                await message.remove_reaction(reaction, user)
+        except asyncio.TimeoutError:
             break
     try:
-        await message.clear_reactions()
+        if ctx.guild is not None:
+            await message.clear_reactions()
     except discord.Forbidden:
         # replace with smthn formal
         await ctx.send("I don't have permission to remove reactions :(\nPlease make sure I have the ``Manage Message`` permission")
