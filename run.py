@@ -1,5 +1,5 @@
 import datetime
-from asyncio.coroutines import coroutine
+
 import discord
 import configparser
 import os
@@ -7,6 +7,7 @@ import io
 import asyncio
 import json
 import time
+from asyncio.coroutines import coroutine
 from threading import Event
 from discord.ext import commands, tasks
 from datetime import date
@@ -82,16 +83,27 @@ async def on_guild_join(guild):
     logs.log("Joined \"" + guild.name + "\" - " + str(guild.id), logger)
 
 @bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.errors.CommandNotFound):
+        return
+    if isinstance(error, commands.errors.MissingPermissions) and ctx.guild is None:
+        return
+    raise error
+
+@bot.event
 async def on_message(message):
     ctx = await bot.get_context(message)
     msg = message.content
-    if (bot.user.mentioned_in(message)):
+    if bot.user.mentioned_in(message):
         if message.mentions[0] == bot.user:
             try:
                 firstMention = msg[0 : msg.index(' ')]
             except ValueError:
                 firstMention = ''
-            if firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: # if mention is first and has space
+            if ctx.guild is None:
+                embed = embeds.prefix_dms(ctx)
+                await ctx.send(embed=embed)
+            elif firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: # if mention is first and has space
                 index = msg.index(' ')
                 await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
             else:
@@ -104,27 +116,41 @@ async def on_message(message):
 
 @bot.command(name="prefix")
 @commands.has_permissions(administrator=True)
-async def prefix(ctx, prefix): # add prefix check through prefix only
-    with open(files.prefix_loc(), 'r') as r:
-        prefixes = json.load(r)
-    prefixes[str(ctx.guild.id)] = prefix
-    with open(files.prefix_loc(), 'w') as w:
-        json.dump(prefixes, w, indent=4)
-    user = ctx.message.author
-    if prefix == '':
-        prefix = 'None'
-    embed = embeds.prefix_change(ctx, prefix)
-    await ctx.send(embed=embed)
+async def prefix(ctx, prefix=None): # add prefix check through prefix only
+    if prefix is None:
+        embed = embeds.prefix_current(ctx, guild_prefix(ctx))
+        await ctx.send(embed=embed) 
+    elif len(prefix) > 10:
+        embed = embeds.prefix_length(ctx)
+        await ctx.send(embed=embed)
+    else:
+        with open(files.prefix_loc(), 'r') as r:
+            prefixes = json.load(r)
+        prefixes[str(ctx.guild.id)] = prefix
+        with open(files.prefix_loc(), 'w') as w:
+            json.dump(prefixes, w, indent=4)
+        user = ctx.message.author
+        if prefix == '':
+            prefix = 'None'
+        embed = embeds.prefix_change(ctx, prefix)
+        await ctx.send(embed=embed)
 
 @bot.command(name="remindme")
 async def remindme(ctx, t, *, rqname):
-    t = int(t) * 60
-    user = ctx.message.author
-    requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
-    embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
-    await ctx.send(embed=embed)
-    timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
-    bot.coroutineList.append([ctx.message.id, timer_task])
+    if len(rqname) > 50:
+        embed = embeds.request_length(ctx, "reminder", "50 characters")
+        await ctx.send(embed=embed)
+    elif int(t) > 720: #currently in minutes
+        embed = embeds.request_length(ctx, "time", "12 hours")
+        await ctx.send(embed=embed)
+    else:
+        t = int(t) * 60
+        user = ctx.message.author
+        requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
+        embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
+        await ctx.send(embed=embed)
+        timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
+        bot.coroutineList.append([ctx.message.id, timer_task])
 
 @bot.command(name="remindlist")
 async def remindlist(ctx):

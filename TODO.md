@@ -22,7 +22,7 @@ Keeping track of what needs to be done :)
   - [x] unique IDs rather than simply an array order
   - [x] json files instead of 2D array
 - [ ] Command Exceptions
-- [ ] Set request limits (name/time/description lengths)
+- [x] Set request limits (name/time/description lengths)
 - [ ] UI Overall
   - [ ] Console output
   - [ ] Embeds
