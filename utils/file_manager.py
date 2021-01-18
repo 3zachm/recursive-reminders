@@ -4,6 +4,23 @@ import io
 import json
 import glob
 
+script_dir = ''
+
+def prefix_loc():
+    return script_dir + '/prefixes.json'
+
+def config_loc():
+    return script_dir + '/config.ini'
+
+def owners_loc():
+    return script_dir + '/owners.json'
+
+def request_dir():
+    return script_dir + '/requests/'
+
+def logs_dir():
+    return script_dir + '/logs/'
+
 def make_config(path):
     config = configparser.ConfigParser()
     if not os.path.exists(path):
