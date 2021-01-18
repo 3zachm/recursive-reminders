@@ -1,4 +1,5 @@
-## recursive-reminders
+# recursive-reminders
+
 [![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders)
 
 Recently merged rewrite to master, but UI/commands are still not fully finished.
