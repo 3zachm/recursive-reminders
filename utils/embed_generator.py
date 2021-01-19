@@ -4,25 +4,14 @@ from discord import Embed
 import utils.utils as utils
 
 empty = Embed.Empty
-all_control_emoji = ["⏮", "◀", "▶", "⏭"]
+all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"] # steal from anigame tbh
 
-def general_embed(title = empty, description = empty, timestamp = empty, color = empty, footer_text = empty, footer_icon_url = empty):
-    embed=Embed(
-        title=title, description=description, timestamp = timestamp, color=color)
-    embed.set_footer(text=footer_text, icon_url=footer_icon_url)
-    return embed
 
-def in_progress(ctx):
-    embed=discord.Embed(
-    title='You already have a reminder in progress',
-    color=0xcc0000)
-    return embed
-
-def reminder_set(ctx, pfx, t):
+def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author
     embed=discord.Embed(
         title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-        description='Do **' + pfx + 'stop** to cancel current and further reminders',
+        description='You created a reminder for ' + rqname + '\nDo ``' + pfx + 'stop [number]`` to cancel current and further reminders',
         timestamp = ctx.message.created_at, color = 0x00CC66)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
@@ -39,7 +28,7 @@ def reminder_none(ctx, pfx):
     user = ctx.message.author
     embed=discord.Embed(
         title='You have no reminder in progress',
-        description='One can be made with **' + pfx +'remindme [minutes]**',
+        description='One can be made with **' + pfx +'remindme [minutes] [name]**',
         timestamp = ctx.message.created_at,
         color=0x6f02cf)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -86,7 +75,7 @@ async def reminder_list(ctx, rqs):
             rq_number += 1
         embed_list.append(embed)
         page_count += 1
-    await embed_pages(ctx, embed_list)
+    await embed_pages(ctx, embed_list, 0)
 
 def timer_end(ctx, pfx, t):
     user = ctx.message.author
@@ -125,7 +114,7 @@ def prefix_length(ctx):
         description="Anyhing less than 10 characters is more reasonable c:")
     return embed
 
-async def embed_pages(ctx, pages):
+async def embed_pages(ctx, pages, mode):
     bot = ctx.bot
     pg = 0
     reaction = None
@@ -140,18 +129,17 @@ async def embed_pages(ctx, pages):
         if str(reaction) == '⏮':
             pg = 0
             await reaction.message.edit(embed = pages[pg])
-        elif str(reaction) == '◀':
+        elif str(reaction) == '⬅️':
             if pg > 0:
                 pg -= 1
                 await reaction.message.edit(embed = pages[pg])
-        elif str(reaction) == '▶':
+        elif str(reaction) == '➡️':
             if pg < len(pages) - 1:
                 pg += 1
                 await reaction.message.edit(embed = pages[pg])
         elif str(reaction) == '⏭':
             pg = len(pages) - 1
             await reaction.message.edit(embed = pages[pg])
-        
         try:
             reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
             if ctx.guild is not None:

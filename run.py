@@ -146,7 +146,7 @@ async def remindme(ctx, t, *, rqname):
         t = int(t) * 60
         user = ctx.message.author
         requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
-        embed = embeds.reminder_set(ctx, guild_prefix(ctx), t)
+        embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
         timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])
