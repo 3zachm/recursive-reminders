@@ -87,7 +87,7 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.MissingPermissions) and ctx.guild is None:
         return
-    raise error
+    logs.exception(error, logger)
 
 @bot.event
 async def on_message(message):
