@@ -14,7 +14,7 @@ import utils.embed_generator as embeds
 import utils.file_manager as files
 import utils.log_manager as logs
 import utils.request_manager as requests
-import utils.utils as utils
+import utils.commands as cmds
 
 config = configparser.ConfigParser()
 files.script_dir = os.path.dirname(os.path.realpath(__file__))
