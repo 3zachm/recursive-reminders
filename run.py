@@ -93,8 +93,11 @@ async def on_command_error(ctx, error):
 async def on_message(message):
     ctx = await bot.get_context(message)
     msg = message.content
+    if ctx.guild is None and (message.content.startswith('!') or message.content.startswith('.')):
+        await ctx.send("I am prefix-less in DMs! Simply type the command like ``help``")
     if bot.user.mentioned_in(message):
         if message.mentions[0] == bot.user:
+            # get first mention value up to a space
             try:
                 firstMention = msg[0 : msg.index(' ')]
             except ValueError:
@@ -102,9 +105,10 @@ async def on_message(message):
             if ctx.guild is None:
                 embed = embeds.prefix_dms(ctx)
                 await ctx.send(embed=embed)
-            elif firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: # if mention is first and has space
+            # if mention is first and has a space after it
+            elif firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: 
                 index = msg.index(' ')
-                await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python
+                await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python?
             else:
                 pfx = str(get_prefix(bot=bot, message=message))
                 if pfx == '':
