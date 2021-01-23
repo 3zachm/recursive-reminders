@@ -138,8 +138,12 @@ async def prefix(ctx, prefix=None):
         embed = embeds.prefix_change(ctx, prefix)
         await ctx.send(embed=embed)
 
-@bot.command(name="remindme")
-async def remindme(ctx, t, *, rqname):
+@bot.group(name="reminder", aliases=["r"], invoke_without_command=True)
+async def reminder(ctx):
+    await ctx.send("Insert reminder options")
+
+@reminder.command(name="add")
+async def reminder_add(ctx, t, *, rqname):
     if len(rqname) > 50:
         embed = embeds.request_length(ctx, "reminder", "50 characters")
         await ctx.send(embed=embed)
@@ -155,13 +159,13 @@ async def remindme(ctx, t, *, rqname):
         timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])
 
-@bot.command(name="remindlist")
-async def remindlist(ctx):
+@reminder.command(name="list")
+async def reminder_list(ctx):
     requests_list = requests.retrieve_list(ctx.message.author.id, files.request_dir())
     await embeds.reminder_list(ctx, requests_list)
 
-@bot.command(name="stop")
-async def stop(ctx, request):
+@reminder.command(name="stop")
+async def reminder_stop(ctx, request):
     user = ctx.message.author
     if requests.retrieve_list(user.id, files.request_dir()) == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
