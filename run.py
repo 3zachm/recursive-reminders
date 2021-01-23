@@ -66,6 +66,7 @@ def get_prefix(bot, message):
 
 botToken = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
+bot.remove_command('help')
 bot.coroutineList = []
 
 @bot.event
@@ -117,7 +118,11 @@ async def on_message(message):
                 await ctx.send(embed=embed)
     await bot.process_commands(message)
 
-@bot.command(name="prefix")
+@bot.command(name="help", help=cmds.help_help, description=cmds.help_args)
+async def help(ctx):
+    await embeds.help(ctx, guild_prefix(ctx), bot)
+
+@bot.command(name="prefix", help=cmds.prefix_help, description=cmds.prefix_args)
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, prefix=None):
     if prefix is None:
@@ -138,11 +143,11 @@ async def prefix(ctx, prefix=None):
         embed = embeds.prefix_change(ctx, prefix)
         await ctx.send(embed=embed)
 
-@bot.group(name="reminder", aliases=["r"], invoke_without_command=True)
+@bot.group(name="reminder", aliases=["r"], invoke_without_command=True, help=cmds.reminder_help, description=cmds.reminder_args)
 async def reminder(ctx):
     await ctx.send("Insert reminder options")
 
-@reminder.command(name="add")
+@reminder.command(name="add", help=cmds.reminder_add_help, description=cmds.reminder_add_args)
 async def reminder_add(ctx, t, *, rqname):
     if len(rqname) > 50:
         embed = embeds.request_length(ctx, "reminder", "50 characters")
@@ -159,12 +164,12 @@ async def reminder_add(ctx, t, *, rqname):
         timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])
 
-@reminder.command(name="list")
+@reminder.command(name="list", help=cmds.reminder_list_help, description=cmds.reminder_list_args)
 async def reminder_list(ctx):
     requests_list = requests.retrieve_list(ctx.message.author.id, files.request_dir())
     await embeds.reminder_list(ctx, requests_list)
 
-@reminder.command(name="stop")
+@reminder.command(name="stop", help=cmds.reminder_stop_help, description=cmds.reminder_stop_args)
 async def reminder_stop(ctx, request):
     user = ctx.message.author
     if requests.retrieve_list(user.id, files.request_dir()) == []:

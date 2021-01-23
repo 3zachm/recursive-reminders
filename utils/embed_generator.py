@@ -4,8 +4,36 @@ from discord import Embed
 import utils.utils as utils
 
 empty = Embed.Empty
-all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"] # steal from anigame tbh
+all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"]
 
+# add aliases
+async def help(ctx, pfx, bot):
+    cmd_list = []
+    embed_list = []
+    page_count = 0
+    cmd_number = 1
+    for cmd in bot.walk_commands():
+        cmd_list.append(cmd)
+    cmd_pages = list(utils.split_array(cmd_list, 10))
+    for page in cmd_pages:
+        embed=discord.Embed(
+            title="**Commands**",
+            description="See a more presentable help list here: (link WIP)")
+        embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(cmd_pages)))
+        try:
+            cmd_page = page
+        except IndexError:
+            # handle no reminders
+            return embed
+        for cmd in cmd_page:
+            embed.add_field(
+                name=pfx + str(cmd) + " " + cmd.description,
+                value=cmd.help,
+                inline=False)
+            cmd_number += 1
+        embed_list.append(embed)
+        page_count += 1
+    await embed_pages(ctx, embed_list, 0)
 
 def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author

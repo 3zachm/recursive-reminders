@@ -27,7 +27,7 @@ Keeping track of what needs to be done :)
   - [ ] Console output
   - [ ] Embeds
 - [x] Use file manager to create common names (prefix.json, other config files)
-- [ ] Adaptable help menu
+- [x] Adaptable help menu
 - [x] Appropriate subcommands
 
 ### Long-term
