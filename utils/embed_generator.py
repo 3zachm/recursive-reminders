@@ -192,8 +192,11 @@ async def embed_pages(ctx, pages, mode):
             await reaction.message.edit(embed = pages[pg])
         try:
             reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
-            if ctx.guild is not None:
-                await message.remove_reaction(reaction, user)
+            try:
+                if ctx.guild is not None:
+                    await message.remove_reaction(reaction, user)
+            except discord.Forbidden:
+                pass
         except asyncio.TimeoutError:
             break
     try:
