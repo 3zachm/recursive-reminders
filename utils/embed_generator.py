@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord import Embed
 import utils.utils as utils
+import utils.commands as cmds
 
 empty = Embed.Empty
 all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"]
@@ -51,7 +52,7 @@ def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author
     embed=discord.Embed(
         title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-        description='You created a reminder for ' + rqname + '\nDo ``' + pfx + 'stop [number]`` to cancel current and further reminders',
+        description='You created a reminder for ' + rqname + '\nDo ``' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '`` to cancel current and further reminders',
         timestamp = ctx.message.created_at, color = 0x00CC66)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
@@ -64,11 +65,20 @@ def reminder_cancel(ctx):
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
+def reminder_cancel_index(ctx, pfx, rqID):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="No reminder in your list matches ID " + rqID,
+        description="Check your current reminder IDs with ``" + pfx + "reminder|r list``",
+        color=0xcc0000)
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
 def reminder_none(ctx, pfx):
     user = ctx.message.author
     embed=discord.Embed(
         title='You have no reminder in progress',
-        description='One can be made with **' + pfx +'remindme [minutes] [name]**',
+        description='One can be made with ``' + pfx + "reminder|r add " + cmds.reminder_add_args + '``',
         timestamp = ctx.message.created_at,
         color=0x6f02cf)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)

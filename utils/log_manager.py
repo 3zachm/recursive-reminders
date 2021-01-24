@@ -12,9 +12,14 @@ def init_logs(path):
     logger.addHandler(handler)
     return logger
 
-def exception(e, logger):
+def exception(ctx, e, logger):
+    logger.error("Unhandled exception on: \"" + ctx.message.content + "\" by " + ctx.message.author.name + " (" + str(ctx.message.author.id) + ")")
+    if ctx.guild is not None:
+        logger.error("Guild: " + ctx.guild.name + " (" + str(ctx.guild.id) + ") ")
+        logger.error("Members: " + str(ctx.guild.member_count))
+    else:
+        logger.error("Occured in DMs")
     logger.error(str(repr(e)))
-    logger.exception(e)
 
 def log(s, logger):
     logger.info(s)

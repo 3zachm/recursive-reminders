@@ -88,7 +88,11 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.MissingPermissions) and ctx.guild is None:
         return
-    logs.exception(error, logger)
+    # unhandled exception occurred
+    if isinstance(error, commands.errors.CommandInvokeError):
+        await ctx.send("**An unhandled exception occurred:** ``" + repr(error) + 
+        "``\nThis has been logged. DM ``3zachm#9999`` if the error persists or you know how you broke the bot c:")
+    logs.exception(ctx, error, logger)
 
 @bot.event
 async def on_message(message):
@@ -177,8 +181,11 @@ async def reminder_stop(ctx, request):
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
     else:
-        requests.remove(user.id, files.request_dir(), int(request), bot.coroutineList)
-        embed = embeds.reminder_cancel(ctx)
+        try:
+            requests.remove(user.id, files.request_dir(), int(request), bot.coroutineList)
+            embed = embeds.reminder_cancel(ctx)
+        except IndexError:
+            embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
         await ctx.send(embed=embed)
 
 # add information for embed
