@@ -145,12 +145,13 @@ async def prefix(ctx, prefix=None):
 
 @bot.group(name="reminder", aliases=["r"], invoke_without_command=True, help=cmds.reminder_help, description=cmds.reminder_args)
 async def reminder(ctx):
-    await ctx.send("Insert reminder options")
+    embed = embeds.reminder_base(ctx, guild_prefix(ctx), bot)
+    await ctx.send(embed=embed)
 
 @reminder.command(name="add", help=cmds.reminder_add_help, description=cmds.reminder_add_args)
 async def reminder_add(ctx, t, *, rqname):
     if len(rqname) > 50:
-        embed = embeds.request_length(ctx, "reminder", "50 characters")
+        embed = embeds.request_length(ctx, "reminder name", "50 characters")
         await ctx.send(embed=embed)
     elif int(t) > 720: #currently in minutes
         embed = embeds.request_length(ctx, "time", "12 hours")

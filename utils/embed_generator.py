@@ -35,6 +35,18 @@ async def help(ctx, pfx, bot):
         page_count += 1
     await embed_pages(ctx, embed_list, 0)
 
+def reminder_base(ctx, pfx, bot):
+    embed=discord.Embed(
+        title="Reminder commands:",
+        description="Make mulltiple recursive reminders up to 12 hour intervals")
+    cmd_list = [bot.get_command('reminder add'), bot.get_command('reminder list'), bot.get_command('reminder stop')]
+    for cmd in cmd_list:
+        embed.add_field(
+            name=pfx + str(cmd) + " " + cmd.description,
+            value=cmd.help,
+            inline=False)
+    return embed
+
 def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author
     embed=discord.Embed(
@@ -64,7 +76,7 @@ def reminder_none(ctx, pfx):
 
 def request_length(ctx, var, length):
     embed=discord.Embed(
-        title="That " + var + " name is too long :(",
+        title="That " + var + " is too long :(",
         description="Try to keep it under or equal to " + length + "!")
     return embed
 
