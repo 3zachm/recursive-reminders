@@ -27,9 +27,15 @@ async def help(ctx, pfx, bot):
             # handle no reminders
             return embed
         for cmd in cmd_page:
+            alias = ""
+            if len(cmd.aliases) > 0:
+                alias = "\nAlias: ``" + pfx
+                for a in cmd.aliases:
+                    alias += a + " "
+                alias = alias[:-1] + "``"
             embed.add_field(
                 name=pfx + str(cmd) + " " + cmd.description,
-                value=cmd.help,
+                value=cmd.help + alias,
                 inline=False)
             cmd_number += 1
         embed_list.append(embed)
