@@ -6,6 +6,7 @@ import io
 import asyncio
 import json
 import time
+import atexit
 from asyncio.coroutines import coroutine
 from threading import Event
 from discord.ext import commands, tasks
@@ -18,6 +19,7 @@ import utils.commands as cmds
 
 config = configparser.ConfigParser()
 files.script_dir = os.path.dirname(os.path.realpath(__file__))
+files.delete_contents(files.request_dir())
 
 # generate empty config files
 files.make_config(files.config_loc())
@@ -201,3 +203,4 @@ def guild_prefix(ctx):
     return get_prefix(bot=bot, message=ctx.message)
 
 bot.run(botToken)
+atexit.register(files.delete_contents(files.request_dir()))

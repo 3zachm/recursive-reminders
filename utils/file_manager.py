@@ -53,6 +53,10 @@ def delete_json(path, rq):
         if os.path.exists(file):
             os.remove(file)
 
+def delete_contents(path):
+    for file in glob.glob(path + '*'):
+        os.remove(file)
+
 def get_json(key, path):
     arr = []
     for file in glob.glob(path + str(key) + '*.json'):
