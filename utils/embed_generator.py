@@ -58,7 +58,7 @@ def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author
     embed=discord.Embed(
         title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-        description='You created a reminder for ' + rqname + '\nDo ``' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '`` to cancel current and further reminders',
+        description='You created a recursive reminder for ``' + rqname + '``\nDo ``' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '`` to cancel current and further reminders',
         timestamp = ctx.message.created_at, color = 0x00CC66)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed

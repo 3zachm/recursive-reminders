@@ -78,6 +78,9 @@ async def on_ready():
         bot.appinfo = await bot.application_info()
     # generate bot owner
     files.make_owners(files.owners_loc(), bot)
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="booting..."))
+    # start periodic presence update
+    asyncio.create_task(update_presence())
 
 @bot.event
 async def on_guild_join(guild):
@@ -103,6 +106,8 @@ async def on_message(message):
     if ctx.guild is None and (message.content.startswith('!') or message.content.startswith('.')):
         await ctx.send("I am prefix-less in DMs! Simply type the command like ``help``")
     if bot.user.mentioned_in(message):
+        if message.mention_everyone:
+            return
         if message.mentions[0] == bot.user:
             # get first mention value up to a space
             try:
@@ -198,9 +203,15 @@ async def timer(ctx, rq, t):
         embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
         await ctx.send("<@!" + str(user.id) + ">", embed=embed)
 
+async def update_presence():
+    while(True):
+        await asyncio.sleep(180)
+        rqs_len = len(bot.coroutineList)
+        await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=str(rqs_len) + " reminders"))
+
 # offhand because discord.py needs get_prefix to have args
 def guild_prefix(ctx):
     return get_prefix(bot=bot, message=ctx.message)
 
 bot.run(botToken)
-atexit.register(files.delete_contents(files.request_dir()))
+atexit.register(files.delete_contents, files.request_dir())
