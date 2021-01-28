@@ -15,6 +15,7 @@ def remove(userid, path, request, arr):
     request = retrieve(userid, path, request)
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
     timer_task.cancel()
+    del arr[utils.return2DIndex(request, arr, 0)]
     files.delete_json(path, request)
 
 def retrieve_list(userid, path):
