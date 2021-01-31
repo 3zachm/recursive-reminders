@@ -10,6 +10,7 @@ import utils.utils as utils
 def create(loc, userid, request, rqname, time):
     data = {"user": userid, "request": request, "name": rqname, "time": time}
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
+    return data
 
 def remove(userid, path, request, arr):
     request = retrieve(userid, path, request)

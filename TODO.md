@@ -25,7 +25,7 @@ Keeping track of what needs to be done :)
 - [x] Set request limits (name/time/description lengths)
 - [ ] UI Overall
   - [ ] Console output
-  - [ ] Embeds
+  - [x] Embeds (basic user-friendly)
 - [x] Use file manager to create common names (prefix.json, other config files)
 - [x] Adaptable help menu
 - [x] Appropriate subcommands

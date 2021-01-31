@@ -170,10 +170,10 @@ async def reminder_add(ctx, t, *, rqname):
     else:
         t = int(t) * 60
         user = ctx.message.author
-        requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
+        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
-        timer_task = asyncio.create_task(timer(ctx, ctx.message.id, t), name=ctx.message.id)
+        timer_task = asyncio.create_task(timer(ctx, rq_json), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])
 
 @reminder.command(name="list", help=cmds.reminder_list_help, description=cmds.reminder_list_args)
@@ -196,11 +196,12 @@ async def reminder_stop(ctx, request):
         await ctx.send(embed=embed)
 
 # add information for embed
-async def timer(ctx, rq, t):
+async def timer(ctx, rq_json):
+    t = rq_json["time"]
     user = ctx.message.author
     while(True):
         await asyncio.sleep(t)
-        embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), t=t)
+        embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), rq_json=rq_json)
         await ctx.send("<@!" + str(user.id) + ">", embed=embed)
 
 async def update_presence():

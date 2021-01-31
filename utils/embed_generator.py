@@ -133,11 +133,14 @@ async def reminder_list(ctx, rqs):
         page_count += 1
     await embed_pages(ctx, embed_list, 0)
 
-def timer_end(ctx, pfx, t):
+def timer_end(ctx, pfx, rq_json):
+    t = rq_json["time"]
+    rq_name = rq_json["name"]
     user = ctx.message.author
     embed=discord.Embed(
         title=str(int(t/60)) + " minutes have passed!",
-        description="To cancel further reminders, do " + pfx + "stop",
+        description="Your reminder for ``" + rq_name + "`` is up" +
+        "\nTo cancel further reminders, do " + pfx + "``r stop [id]``",
         color=0xedc707,
         timestamp=ctx.message.created_at)
     embed.set_author(name=user.name + "", icon_url=user.avatar_url)
