@@ -19,7 +19,8 @@ async def help(ctx, pfx, bot):
     for page in cmd_pages:
         embed=discord.Embed(
             title="**Commands**",
-            description="See a more presentable help list here: (link WIP)")
+            description="See a more presentable help list here: (link WIP)"
+        )
         embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(cmd_pages)))
         try:
             cmd_page = page
@@ -36,7 +37,8 @@ async def help(ctx, pfx, bot):
             embed.add_field(
                 name=pfx + str(cmd) + " " + cmd.description,
                 value=cmd.help + alias,
-                inline=False)
+                inline=False
+            )
             cmd_number += 1
         embed_list.append(embed)
         page_count += 1
@@ -45,13 +47,15 @@ async def help(ctx, pfx, bot):
 def reminder_base(ctx, pfx, bot):
     embed=discord.Embed(
         title="Reminder commands:",
-        description="Make mulltiple recursive reminders up to 12 hour intervals")
+        description="Make mulltiple recursive reminders up to 12 hour intervals"
+    )
     cmd_list = [bot.get_command('reminder add'), bot.get_command('reminder list'), bot.get_command('reminder stop')]
     for cmd in cmd_list:
         embed.add_field(
             name=pfx + str(cmd) + " " + cmd.description,
             value=cmd.help,
-            inline=False)
+            inline=False
+        )
     return embed
 
 def reminder_set(ctx, pfx, t, rqname):
@@ -59,7 +63,8 @@ def reminder_set(ctx, pfx, t, rqname):
     embed=discord.Embed(
         title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
         description='You created a recursive reminder for ``' + rqname + '``\nDo ``' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '`` to cancel current and further reminders',
-        timestamp = ctx.message.created_at, color = 0x00CC66)
+        timestamp = ctx.message.created_at, color = 0x00CC66
+    )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
@@ -67,7 +72,8 @@ def reminder_cancel(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
         title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
-        color=0xcc0000)
+        color=0xcc0000
+    )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
@@ -76,7 +82,8 @@ def reminder_cancel_index(ctx, pfx, rqID):
     embed=discord.Embed(
         title="No reminder in your list matches ID " + rqID,
         description="Check your current reminder IDs with ``" + pfx + "reminder|r list``",
-        color=0xcc0000)
+        color=0xcc0000
+    )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
@@ -86,14 +93,16 @@ def reminder_none(ctx, pfx):
         title='You have no reminder in progress',
         description='One can be made with ``' + pfx + "reminder|r add " + cmds.reminder_add_args + '``',
         timestamp = ctx.message.created_at,
-        color=0x6f02cf)
+        color=0x6f02cf
+    )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
 def request_length(ctx, var, length):
     embed=discord.Embed(
         title="That " + var + " is too long :(",
-        description="Try to keep it under or equal to " + length + "!")
+        description="Try to keep it under or equal to " + length + "!"
+    )
     return embed
 
 async def reminder_list(ctx, rqs):
@@ -115,7 +124,8 @@ async def reminder_list(ctx, rqs):
     for page in rq_pages:
         embed=discord.Embed(
             title="**Reminders**",
-            description="All your active reminders are shown below")
+            description="All your active reminders are shown below"
+        )
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(rq_pages)))
         try:
@@ -127,7 +137,8 @@ async def reminder_list(ctx, rqs):
             embed.add_field(
                 name="#" + str(rq_number) + " | " + rq['name'], 
                 value="Length: " + str(rq['time']/60) + "m", 
-                inline=False)
+                inline=False
+            )
             rq_number += 1
         embed_list.append(embed)
         page_count += 1
@@ -142,7 +153,8 @@ def timer_end(ctx, pfx, rq_json):
         description="Your reminder for ``" + rq_name + "`` is up" +
         "\nTo cancel further reminders, do " + pfx + "``r stop [id]``",
         color=0xedc707,
-        timestamp=ctx.message.created_at)
+        timestamp=ctx.message.created_at
+    )
     embed.set_author(name=user.name + "", icon_url=user.avatar_url)
     return embed
 
@@ -151,26 +163,30 @@ def prefix_current(ctx, pfx):
         title="My prefix is ``" + pfx + "`` for this guild",
         description="If you have prefix conflicts, mention me followed by a new prefix!" + 
         "\nOnly single letter prefixes can be applied this way for exception reasons",
-        color=0x00CC66)
+        color=0x00CC66
+    )
     return embed
 
 def prefix_change(ctx, pfx):
     embed=discord.Embed(
         title="Success!",
         description="Prefix changed to ``" + pfx + "``",
-        color=0x00CC66)
+        color=0x00CC66
+    )
     return embed
 
 def prefix_dms(ctx):
     embed=discord.Embed(
         title="I have no prefix for DMs!",
-        description="Simply send the command keyword like ``help``")
+        description="Simply send the command keyword like ``help``"
+    )
     return embed
 
 def prefix_length(ctx):
     embed=discord.Embed(
         title="That prefix is too long",
-        description="Anyhing less than 10 characters is more reasonable c:")
+        description="Anyhing less than 10 characters is more reasonable c:"
+    )
     return embed
 
 async def embed_pages(ctx, pages, mode):

@@ -34,22 +34,22 @@ config = configparser.RawConfigParser(allow_no_value=True)
 config.read_file(io.StringIO(discord_config))
 
 try:
-    defaultPrefix = config.get('discord', 'default_prefix')
-    generateLogs = config.getboolean('python', 'generate_logs')
+    default_prefix = config.get('discord', 'default_prefix')
+    generate_logs = config.getboolean('python', 'generate_logs')
 except (configparser.NoSectionError, configparser.NoOptionError) as e:
     print(e)
     print("Ensure config file has all entries present. If you recently pulled an update, consider regenerating the config")
     quit()
 
 #logging
-if generateLogs:
+if generate_logs:
     logger = logs.init_logs(files.logs_dir())
 
 # initializes a server in the prefix file
 def initPrefix(serverID):
     with open(files.prefix_loc(), 'r') as r:
         prefixes = json.load(r)
-    prefixes[str(serverID)] = defaultPrefix
+    prefixes[str(serverID)] = default_prefix
     with open(files.prefix_loc(), 'w') as w:
         json.dump(prefixes, w, indent=4)
 
@@ -67,7 +67,7 @@ def get_prefix(bot, message):
         pfx = prefixes[str(message.guild.id)]
     return pfx
 
-botToken = config.get('discord', 'token')
+bot_token = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 bot.coroutineList = []
@@ -86,7 +86,7 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     initPrefix(guild.id)
-    if generateLogs:
+    if generate_logs:
         logs.log("Joined \"" + guild.name + "\" - " + str(guild.id), logger)
 
 @bot.event
@@ -99,7 +99,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandInvokeError):
         await ctx.send("**An unhandled exception occurred:** ``" + repr(error) + 
         "``\nThis has been logged. DM ``3zachm#9999`` if the error persists or you know how you broke the bot c:")
-    if generateLogs:
+    if generate_logs:
         logs.exception(ctx, error, logger)
     else:
         raise error
@@ -116,14 +116,14 @@ async def on_message(message):
         if message.mentions[0] == bot.user:
             # get first mention value up to a space
             try:
-                firstMention = msg[0 : msg.index(' ')]
+                first_mention = msg[0 : msg.index(' ')]
             except ValueError:
-                firstMention = ''
+                first_mention = ''
             if ctx.guild is None:
                 embed = embeds.prefix_dms(ctx)
                 await ctx.send(embed=embed)
             # if mention is first and has a space after it
-            elif firstMention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: 
+            elif first_mention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: 
                 index = msg.index(' ')
                 await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python?
             else:
@@ -221,5 +221,5 @@ async def update_presence():
 def guild_prefix(ctx):
     return get_prefix(bot=bot, message=ctx.message)
 
-bot.run(botToken)
+bot.run(bot_token)
 atexit.register(files.delete_contents, files.request_dir())

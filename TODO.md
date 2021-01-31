@@ -38,6 +38,9 @@ Keeping track of what needs to be done c:
   - [ ] Stop timer through reaction
 - [ ] Command Exceptions
   - [ ] Missing requirements per cmd
+- [ ] Optimizations
+  - [ ] No react on single-pagination
+  - [ ] Multiple emote react sets from mode
 
 ### Long-term
 
