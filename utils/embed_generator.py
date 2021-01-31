@@ -63,10 +63,10 @@ def reminder_set(ctx, pfx, t, rqname):
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
-def reminder_cancel(ctx):
+def reminder_cancel(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
-        title="Your reminder was cancelled",
+        title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
         color=0xcc0000)
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed

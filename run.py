@@ -85,7 +85,8 @@ async def on_ready():
 @bot.event
 async def on_guild_join(guild):
     initPrefix(guild.id)
-    logs.log("Joined \"" + guild.name + "\" - " + str(guild.id), logger)
+    if generateLogs:
+        logs.log("Joined \"" + guild.name + "\" - " + str(guild.id), logger)
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -97,7 +98,10 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandInvokeError):
         await ctx.send("**An unhandled exception occurred:** ``" + repr(error) + 
         "``\nThis has been logged. DM ``3zachm#9999`` if the error persists or you know how you broke the bot c:")
-    logs.exception(ctx, error, logger)
+    if generateLogs:
+        logs.exception(ctx, error, logger)
+    else:
+        raise error
 
 @bot.event
 async def on_message(message):
@@ -184,13 +188,15 @@ async def reminder_list(ctx):
 @reminder.command(name="stop", help=cmds.reminder_stop_help, description=cmds.reminder_stop_args)
 async def reminder_stop(ctx, request):
     user = ctx.message.author
+    request = int(request)
     if requests.retrieve_list(user.id, files.request_dir()) == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
     else:
         try:
+            rq_json = requests.retrieve_json(user.id, files.request_dir(), request)
             requests.remove(user.id, files.request_dir(), int(request), bot.coroutineList)
-            embed = embeds.reminder_cancel(ctx)
+            embed = embeds.reminder_cancel(ctx, rq_json)
         except IndexError:
             embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
         await ctx.send(embed=embed)

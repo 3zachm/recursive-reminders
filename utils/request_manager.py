@@ -13,7 +13,8 @@ def create(loc, userid, request, rqname, time):
     return data
 
 def remove(userid, path, request, arr):
-    request = retrieve(userid, path, request)
+    # get the request number (chronological)
+    request = retrieve_json(userid, path, request)['request']
     timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
     timer_task.cancel()
     del arr[utils.return2DIndex(request, arr, 0)]
@@ -28,9 +29,9 @@ def retrieve_list(userid, path):
         request_list.append(request)
     return request_list
 
-def retrieve(userid, path, request):
+def retrieve_json(userid, path, request):
     request_files = files.get_json(userid, path)
     request_json = request_files[request - 1]
     with open(request_json, 'r') as r:
         request = json.load(r)
-    return request['request']
+    return request
