@@ -16,6 +16,7 @@ import utils.file_manager as files
 import utils.log_manager as logs
 import utils.request_manager as requests
 import utils.commands as cmds
+import utils.screen as screen
 
 config = configparser.ConfigParser()
 files.script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -73,7 +74,6 @@ bot.coroutineList = []
 
 @bot.event
 async def on_ready():
-    print('Running...')
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
     # generate bot owner
@@ -81,6 +81,7 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="booting..."))
     # start periodic presence update
     asyncio.create_task(update_presence())
+    asyncio.create_task(screen.loop(bot))
 
 @bot.event
 async def on_guild_join(guild):

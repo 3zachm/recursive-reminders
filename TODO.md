@@ -24,7 +24,7 @@ Keeping track of what needs to be done :)
 - [ ] Command Exceptions
 - [x] Set request limits (name/time/description lengths)
 - [ ] UI Overall
-  - [ ] Console output
+  - [x] Console output (framework)
   - [x] Embeds (basic user-friendly)
 - [x] Use file manager to create common names (prefix.json, other config files)
 - [x] Adaptable help menu
