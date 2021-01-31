@@ -1,10 +1,10 @@
 # TODO
 
-Keeping track of what needs to be done :)
+Keeping track of what needs to be done c:
 
-## indev
+## Indev
 
-### 1/5/2021 -> 1/10/2021
+### 1/5/2021 → 1/10/2021
 
 - [x] Improve code quality
   - [x] Fix CodeFactor issues
@@ -14,21 +14,30 @@ Keeping track of what needs to be done :)
   - [x] Log manager
 - [x] Logging Functionality
 
-### 1/11/2021 -> x
+## Timer Rewrite
 
-(timer rewrite)
+### 1/11/2021 → 1/31/2021
 
 - [x] Multiple timers
   - [x] unique IDs rather than simply an array order
   - [x] json files instead of 2D array
-- [ ] Command Exceptions
 - [x] Set request limits (name/time/description lengths)
-- [ ] UI Overall
+- [x] UI Overall
   - [x] Console output (framework)
   - [x] Embeds (basic user-friendly)
 - [x] Use file manager to create common names (prefix.json, other config files)
 - [x] Adaptable help menu
 - [x] Appropriate subcommands
+
+## Release
+
+### 1/31/2021 → x
+
+- [ ] React-confirmation for servers
+  - [ ] Require reaction for next timer to go off
+  - [ ] Stop timer through reaction
+- [ ] Command Exceptions
+  - [ ] Missing requirements per cmd
 
 ### Long-term
 
