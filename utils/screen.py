@@ -20,10 +20,6 @@ async def main(bot):
     stdscr.nodelay(True)
     await check_interrupt(stdscr)
 
-async def loop(bot):
-    while True:
-        await main(bot)
-
 async def check_interrupt(stdscr):
     try:
         h = stdscr.getch()
@@ -33,3 +29,7 @@ async def check_interrupt(stdscr):
             raise EOFError
     except KeyboardInterrupt:
         quit()
+
+async def loop(bot):
+    while True:
+        await main(bot)

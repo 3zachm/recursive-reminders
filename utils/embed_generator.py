@@ -42,7 +42,7 @@ async def help(ctx, pfx, bot):
             cmd_number += 1
         embed_list.append(embed)
         page_count += 1
-    await embed_pages(ctx, embed_list, 0)
+    await embed_pages(ctx, embed_list)
 
 def reminder_base(ctx, pfx, bot):
     embed=discord.Embed(
@@ -142,7 +142,7 @@ async def reminder_list(ctx, rqs):
             rq_number += 1
         embed_list.append(embed)
         page_count += 1
-    await embed_pages(ctx, embed_list, 0)
+    await embed_pages(ctx, embed_list)
 
 def timer_end(ctx, pfx, rq_json):
     t = rq_json["time"]
@@ -151,7 +151,7 @@ def timer_end(ctx, pfx, rq_json):
     embed=discord.Embed(
         title=str(int(t/60)) + " minutes have passed!",
         description="Your reminder for ``" + rq_name + "`` is up" +
-        "\nTo cancel further reminders, do " + pfx + "``r stop [id]``",
+        "\nTo cancel further reminders, do ``" + pfx + "reminder|r stop [id]``",
         color=0xedc707,
         timestamp=ctx.message.created_at
     )
@@ -189,7 +189,10 @@ def prefix_length(ctx):
     )
     return embed
 
-async def embed_pages(ctx, pages, mode):
+async def embed_pages(ctx, pages):
+    if len(pages) < 2:
+        await ctx.send(embed=pages[0])
+        return
     bot = ctx.bot
     pg = 0
     reaction = None
