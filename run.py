@@ -175,7 +175,11 @@ async def reminder_add(ctx, t, *, rqname):
     else:
         t = int(t) * 60
         user = ctx.message.author
-        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t)
+        if ctx.guild is None:
+            guild_name = ""
+        else:
+            guild_name = ctx.guild.name
+        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t, guild_name)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
         timer_task = asyncio.create_task(timer(ctx, rq_json), name=ctx.message.id)
