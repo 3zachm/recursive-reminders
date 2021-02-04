@@ -15,9 +15,9 @@ def create(loc, userid, request, rqname, time, guild_name):
 def remove(userid, path, request, arr):
     # get the request number (chronological)
     request = retrieve_json(userid, path, request)['request']
-    timer_task = arr[utils.return2DIndex(request, arr, 0)][1]
+    timer_task = arr[utils.return2DIndex(request, arr)][1]
     timer_task.cancel()
-    del arr[utils.return2DIndex(request, arr, 0)]
+    del arr[utils.return2DIndex(request, arr)]
     files.delete_json(path, request)
 
 def retrieve_list(userid, path):
