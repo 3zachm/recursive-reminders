@@ -1,6 +1,6 @@
 # recursive-reminders
 
-[![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders)
+[![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders) [![Maintainability](https://api.codeclimate.com/v1/badges/047a379134cb872d9743/maintainability)](https://codeclimate.com/github/3zachm/recursive-reminders/maintainability)
 
 WIP! Approaching stable enough for public hosting as of recent.\
 Global default prefix is ! but can be changed in generated config.
