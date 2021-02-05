@@ -15,7 +15,7 @@ Global default prefix is ! but can be changed in generated config.
 - ``@bot_mention`` - Shows current guild prefix
 - ``@bot_mention [char]`` - Alternative prefix change
 
-Reminders have AFK checks in place that require a reaction before the next ping occurence
+Reminders have AFK checks in place that require a reaction before the next ping occurence\
 Likewise, you can also stop them with a reaction.
 
 ![Timer example](https://i.imgur.com/vLQk9oQ.png)
