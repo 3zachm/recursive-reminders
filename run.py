@@ -71,6 +71,7 @@ bot_token = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 bot.coroutineList = []
+use_screen = True
 
 @bot.event
 async def on_ready():
@@ -81,7 +82,10 @@ async def on_ready():
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="booting..."))
     # start periodic presence update
     asyncio.create_task(update_presence())
-    asyncio.create_task(screen.loop(bot))
+    if use_screen:
+        asyncio.create_task(screen.loop(bot))
+    else:
+        print("Screen disabled\n\nRunning...")
 
 @bot.event
 async def on_guild_join(guild):
@@ -200,7 +204,7 @@ async def reminder_stop(ctx, request):
     else:
         try:
             rq_json = requests.retrieve_json(user.id, files.request_dir(), request)
-            requests.remove(user.id, files.request_dir(), int(request), bot.coroutineList)
+            requests.remove(files.request_dir(), rq_json['request'], bot.coroutineList)
             embed = embeds.reminder_cancel(ctx, rq_json)
         except IndexError:
             embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
@@ -209,11 +213,13 @@ async def reminder_stop(ctx, request):
 # add information for embed
 async def timer(ctx, rq_json):
     t = rq_json["time"]
-    user = ctx.message.author
+    react = None
+    pfx = guild_prefix(ctx)
     while(True):
         await asyncio.sleep(t)
-        embed=embeds.timer_end(ctx=ctx, pfx=guild_prefix(ctx), rq_json=rq_json)
-        await ctx.send("<@!" + str(user.id) + ">", embed=embed)
+        if react is not None:
+            react.cancel()
+        react = asyncio.create_task(embeds.timer_end(ctx, pfx, rq_json))
 
 async def update_presence():
     while(True):

@@ -33,9 +33,9 @@ Keeping track of what needs to be done c:
 
 ### 1/31/2021 → x
 
-- [ ] React-confirmation for servers
-  - [ ] Require reaction for next timer to go off
-  - [ ] Stop timer through reaction
+- [x] React-confirmation for servers
+  - [x] Require reaction for next timer to go off
+  - [x] Stop timer through reaction
 - [ ] Command Exceptions
   - [ ] Missing requirements per cmd
 - [x] Optimizations

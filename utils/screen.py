@@ -2,13 +2,11 @@ import asyncio
 import curses
 import discord
 
-stdscr = curses.initscr()
-
 def print_counts(bot):
-    stdscr.addstr(0, 0, "Guilds: " + str(len(bot.guilds)))
-    stdscr.addstr(1, 0, "Requests: " + str(len(bot.coroutineList)))
+    bot.stdscr.addstr(0, 0, "Guilds: " + str(len(bot.guilds)))
+    bot.stdscr.addstr(1, 0, "Requests: " + str(len(bot.coroutineList)))
 
-    stdscr.refresh()
+    bot.stdscr.refresh()
 
 async def main(bot):
     print_counts(bot)
@@ -17,12 +15,12 @@ async def main(bot):
     await asyncio.sleep(5)
     curses.curs_set(0)
     #curses.cbreak()
-    stdscr.nodelay(True)
-    await check_interrupt(stdscr)
+    bot.stdscr.nodelay(True)
+    await check_interrupt(bot)
 
-async def check_interrupt(stdscr):
+async def check_interrupt(bot):
     try:
-        h = stdscr.getch()
+        h = bot.stdscr.getch()
         if h == 3:
             raise KeyboardInterrupt
         if h == 26:
@@ -31,5 +29,6 @@ async def check_interrupt(stdscr):
         quit()
 
 async def loop(bot):
+    bot.stdscr = curses.initscr()
     while True:
         await main(bot)

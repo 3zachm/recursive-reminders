@@ -12,13 +12,11 @@ def create(loc, userid, request, rqname, time, guild_name):
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
     return data
 
-def remove(userid, path, request, arr):
-    # get the request number (chronological)
-    request = retrieve_json(userid, path, request)['request']
-    timer_task = arr[utils.return2DIndex(request, arr)][1]
+def remove(path, request_id, arr):
+    timer_task = arr[utils.return2DIndex(request_id, arr)][1]
     timer_task.cancel()
-    del arr[utils.return2DIndex(request, arr)]
-    files.delete_json(path, request)
+    del arr[utils.return2DIndex(request_id, arr)]
+    files.delete_json(path, request_id)
 
 def retrieve_list(userid, path):
     request_list = []
@@ -28,6 +26,16 @@ def retrieve_list(userid, path):
             request = json.load(r)
         request_list.append(request)
     return request_list
+
+def retrieve_json_id(path, userid, request_id):
+    request_json = files.get_json(str(userid) + "_" + str(request_id), path)[0]
+    with open(request_json, 'r') as r:
+        rq_json = json.load(r)
+    return rq_json
+
+def get_index(userid, path, rq_json):
+    arr = retrieve_list(userid, path)
+    return arr.index(rq_json)
 
 def retrieve_json(userid, path, request):
     request_files = files.get_json(userid, path)

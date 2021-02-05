@@ -3,9 +3,12 @@ import discord
 from discord import Embed
 import utils.utils as utils
 import utils.commands as cmds
+import utils.request_manager as requests
+import utils.file_manager as files
 
 empty = Embed.Empty
 all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"]
+confirm_control_emoji = ["✅","❌"]
 
 # add aliases
 async def help(ctx, pfx, bot):
@@ -72,6 +75,17 @@ def reminder_cancel(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
         title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
+        color=0xcc0000
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+
+def reminder_cancel_timeout(ctx, rq_json):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
+        description="No reaction was received before the next reminder occurence",
         color=0xcc0000
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -144,19 +158,64 @@ async def reminder_list(ctx, rqs):
         page_count += 1
     await embed_pages(ctx, embed_list)
 
-def timer_end(ctx, pfx, rq_json):
+async def timer_end(ctx, pfx, rq_json):
     t = rq_json["time"]
     rq_name = rq_json["name"]
     user = ctx.message.author
     embed=discord.Embed(
         title=str(int(t/60)) + " minutes have passed!",
-        description="Your reminder for ``" + rq_name + "`` is up" +
-        "\nTo cancel further reminders, do ``" + pfx + "reminder|r stop [id]``",
+        description="Your reminder for ``" + rq_name + "`` is up (id " + str(requests.get_index(user.id, files.request_dir(), rq_json) + 1) + ")"
+        "\n" +
+        "``React``  ✅  to confirm you aren't AFK by the next occurence" +
+        "\n``React``  ❌  to stop or do ``" + pfx + "reminder|r stop [id]``",
         color=0xedc707,
         timestamp=ctx.message.created_at
     )
     embed.set_author(name=user.name + "", icon_url=user.avatar_url)
+    await timer_react(ctx, embed)
+
+def timer_continue(ctx, rq_json):
+    t = rq_json["time"]
+    rq_name = rq_json["name"]
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="Your reminder will continue  ✅",
+        description="You'll be reminded for ``" + rq_json["name"] + "`` again",
+        color=0x00CC66
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
+
+async def timer_react(ctx, embed):
+    bot = ctx.bot
+    reaction = None
+    message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
+    rq_continue = False
+    rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, ctx.message.id)
+    # 5 second grace to ensure it cancels
+    t = rq_json["time"] - 5
+
+    for emoji in confirm_control_emoji:
+        await message.add_reaction(emoji)
+
+    def check(reaction, user):
+        return reaction.message.id == message.id and user == ctx.author
+
+    try:
+        reaction, user = await bot.wait_for('reaction_add', timeout = t, check = check)
+        if str(reaction) == '✅':
+            rq_continue = True
+        elif str(reaction) == '❌':
+            #await remove_reactions(ctx, message)
+            await ctx.send(embed=reminder_cancel(ctx, rq_json))
+            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+    except asyncio.TimeoutError:
+        requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+        await ctx.send(embed=reminder_cancel_timeout(ctx, rq_json))
+
+    if rq_continue:
+        await ctx.send(embed=timer_continue(ctx, rq_json))
+    await remove_reactions(ctx, message)
 
 def prefix_current(ctx, pfx):
     embed=discord.Embed(
@@ -227,6 +286,9 @@ async def embed_pages(ctx, pages):
                 pass
         except asyncio.TimeoutError:
             break
+    await remove_reactions(ctx, message)
+
+async def remove_reactions(ctx, message):
     try:
         if ctx.guild is not None:
             await message.clear_reactions()
