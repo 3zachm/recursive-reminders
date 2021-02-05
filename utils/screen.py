@@ -26,6 +26,8 @@ async def check_interrupt(bot):
         if h == 26:
             raise EOFError
     except KeyboardInterrupt:
+        curses.nocbreak()
+        curses.endwin()
         quit()
 
 async def loop(bot):
