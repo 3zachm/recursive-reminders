@@ -94,7 +94,7 @@ def reminder_cancel_timeout(ctx, rq_json):
 def reminder_cancel_index(ctx, pfx, rqID):
     user = ctx.message.author
     embed=discord.Embed(
-        title="No reminder in your list matches ID " + rqID,
+        title="No reminder in your list matches ID " + str(rqID),
         description="Check your current reminder IDs with ``" + pfx + "reminder|r list``",
         color=0xcc0000
     )
@@ -157,6 +157,30 @@ async def reminder_list(ctx, rqs):
         embed_list.append(embed)
         page_count += 1
     await embed_pages(ctx, embed_list)
+
+def reminder_add_missing(ctx, pfx, bot):
+    embed=discord.Embed(
+        title="Missing requirements!",
+    )
+    cmd = bot.get_command('reminder add')
+    embed.add_field(
+        name=pfx + str(cmd) + " " + cmd.description,
+        value=cmd.help + "\n\nExample: ``!r add 20 Raid`` creates a 20 minute timer named Raid",
+        inline=False
+    )
+    return embed
+
+def reminder_stop_missing(ctx, pfx, bot):
+    embed=discord.Embed(
+        title="Missing requirements!",
+    )
+    cmd = bot.get_command('reminder stop')
+    embed.add_field(
+        name=pfx + str(cmd) + " " + cmd.description,
+        value="Specify an ID to stop, which can be found in the reminder list",
+        inline=False
+    )
+    return embed
 
 async def timer_end(ctx, pfx, rq_json):
     t = rq_json["time"]

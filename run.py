@@ -99,6 +99,13 @@ async def on_command_error(ctx, error):
         return
     if isinstance(error, commands.errors.MissingPermissions) and ctx.guild is None:
         return
+    if isinstance(error, commands.errors.MissingRequiredArgument):
+        if str(ctx.command) == "reminder add":
+            await ctx.send(embed=embeds.reminder_add_missing(ctx, guild_prefix(ctx), bot))
+            return
+        if str(ctx.command) == "reminder stop":
+            await ctx.send(embed=embeds.reminder_stop_missing(ctx, guild_prefix(ctx), bot))
+            return
     # unhandled exception occurred
     if isinstance(error, commands.errors.CommandInvokeError):
         await ctx.send("**An unhandled exception occurred:** ``" + repr(error) + 
@@ -170,12 +177,21 @@ async def reminder(ctx):
 
 @reminder.command(name="add", help=cmds.reminder_add_help, description=cmds.reminder_add_args)
 async def reminder_add(ctx, t, *, rqname):
+    try:
+        t = int(t)
+    except ValueError:
+        await ctx.send("That time doesn't seem like a real integer. Decimals aren't supported at the moment.")
+        return
     if len(rqname) > 50:
         embed = embeds.request_length(ctx, "reminder name", "50 characters")
         await ctx.send(embed=embed)
-    elif int(t) > 720: #currently in minutes
+    elif t > 720: #currently in minutes
         embed = embeds.request_length(ctx, "time", "12 hours")
         await ctx.send(embed=embed)
+    elif t == 0:
+        await ctx.send("You don't need a 0 minute timer :)")
+    elif t < 0:
+        await ctx.send("Counting by negatives seems dangerous")
     else:
         t = int(t) * 60
         user = ctx.message.author
@@ -197,7 +213,11 @@ async def reminder_list(ctx):
 @reminder.command(name="stop", help=cmds.reminder_stop_help, description=cmds.reminder_stop_args)
 async def reminder_stop(ctx, request):
     user = ctx.message.author
-    request = int(request)
+    try:
+        request = int(request)
+    except ValueError:
+        await ctx.send(embed=embeds.reminder_stop_missing(ctx, guild_prefix(ctx), bot))
+        return
     if requests.retrieve_list(user.id, files.request_dir()) == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
         await ctx.send(embed=embed)
@@ -214,12 +234,11 @@ async def reminder_stop(ctx, request):
 async def timer(ctx, rq_json):
     t = rq_json["time"]
     react = None
-    pfx = guild_prefix(ctx)
     while(True):
         await asyncio.sleep(t)
         if react is not None:
             react.cancel()
-        react = asyncio.create_task(embeds.timer_end(ctx, pfx, rq_json))
+        react = asyncio.create_task(embeds.timer_end(ctx, guild_prefix(ctx), rq_json))
 
 async def update_presence():
     while(True):

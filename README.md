@@ -2,12 +2,12 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders) [![Maintainability](https://api.codeclimate.com/v1/badges/047a379134cb872d9743/maintainability)](https://codeclimate.com/github/3zachm/recursive-reminders/maintainability)
 
-**Public soon!** (a couple days at most)
+**Public soon!** (getting a VPS tomorrow, I need one for other things anyways)
 Global default prefix is ! but can be changed in generated config.
 
 ## Commands
 
-- ``!reminder|r add [minutes] [name (string)]`` - Sends a ping to the user every given minute(s)
+- ``!reminder|r add [minutes (int)] [name (string)]`` - Sends a ping to the user every given minute(s)
 - ``!reminder|r list`` - Shows list of all current reminders
 - ``!reminder|r stop [id]`` - Stops the reminder loop and any in-progress timer for the user.
 - ``!prefix [char]`` - Changes prefix, works on per-guild basis.

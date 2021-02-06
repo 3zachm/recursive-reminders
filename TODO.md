@@ -29,15 +29,15 @@ Keeping track of what needs to be done c:
 - [x] Adaptable help menu
 - [x] Appropriate subcommands
 
-## Release
+## Release (v1.0)
 
-### 1/31/2021 → x
+### 1/31/2021 → 2/6/2021
 
 - [x] React-confirmation for servers
   - [x] Require reaction for next timer to go off
   - [x] Stop timer through reaction
-- [ ] Command Exceptions
-  - [ ] Missing requirements per cmd
+- [x] Command Exceptions
+  - [x] Missing requirements per cmd
 - [x] Optimizations
   - [x] No react on single-pagination
 
