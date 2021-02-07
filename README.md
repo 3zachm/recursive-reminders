@@ -23,4 +23,4 @@ Likewise, you can also stop them with a reaction.
 
 ## Requirements
 
-Built on **Python 3.9.0** with the packages in ``requirements.txt``
+Built on **Python 3.9.0**, get ``discord.py`` and ``windows-curses`` if needed
