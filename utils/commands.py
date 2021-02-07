@@ -17,7 +17,7 @@ reminder_stop_help = "Stops the reminder ID which can be seen in your list"
 reminder_stop_args = "[id]"
 
 # hide commands from help menu generator
-hide_help = ['system', 'system pt']
+hide_help = ['system', 'system pt', 'system fstop', 'system global_dm']
 
 def owner_check(ctx):
     with open(files.owners_loc(), 'r') as r:

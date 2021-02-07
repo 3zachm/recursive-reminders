@@ -37,12 +37,15 @@ async def help(ctx, pfx, bot):
                 for a in cmd.aliases:
                     alias += a + " "
                 alias = alias[:-1] + "``"
-            embed.add_field(
-                name=pfx + str(cmd) + " " + cmd.description,
-                value=cmd.help + alias,
-                inline=False
-            )
-            cmd_number += 1
+            try:
+                embed.add_field(
+                    name=pfx + str(cmd) + " " + cmd.description,
+                    value=cmd.help + alias,
+                    inline=False
+                )
+                cmd_number += 1
+            except TypeError:
+                pass
         embed_list.append(embed)
         page_count += 1
     await embed_pages(ctx, embed_list)
