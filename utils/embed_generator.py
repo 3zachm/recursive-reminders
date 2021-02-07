@@ -1,23 +1,24 @@
 import asyncio
+import json
 import discord
-from discord import Embed
 import utils.utils as utils
 import utils.commands as cmds
 import utils.request_manager as requests
 import utils.file_manager as files
 
-empty = Embed.Empty
+empty = discord.Embed.Empty
 all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"]
 confirm_control_emoji = ["✅","❌"]
 
-# add aliases
 async def help(ctx, pfx, bot):
     cmd_list = []
+    hidden = cmds.hide_help
     embed_list = []
     page_count = 0
     cmd_number = 1
     for cmd in bot.walk_commands():
-        cmd_list.append(cmd)
+        if str(cmd) not in hidden:
+            cmd_list.append(cmd)
     cmd_pages = list(utils.split_array(cmd_list, 10))
     for page in cmd_pages:
         embed=discord.Embed(
@@ -28,7 +29,6 @@ async def help(ctx, pfx, bot):
         try:
             cmd_page = page
         except IndexError:
-            # handle no reminders
             return embed
         for cmd in cmd_page:
             alias = ""
@@ -230,12 +230,19 @@ async def timer_react(ctx, embed):
         if str(reaction) == '✅':
             rq_continue = True
         elif str(reaction) == '❌':
-            #await remove_reactions(ctx, message)
-            await ctx.send(embed=reminder_cancel(ctx, rq_json))
-            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+            try:
+                requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+                await ctx.send(embed=reminder_cancel(ctx, rq_json))
+            except IndexError:
+                pass
+            
+            
     except asyncio.TimeoutError:
-        requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
-        await ctx.send(embed=reminder_cancel_timeout(ctx, rq_json))
+        try:
+            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+            await ctx.send(embed=reminder_cancel_timeout(ctx, rq_json))
+        except IndexError:
+            pass
 
     if rq_continue:
         await ctx.send(embed=timer_continue(ctx, rq_json))
@@ -269,6 +276,25 @@ def prefix_length(ctx):
     embed=discord.Embed(
         title="That prefix is too long",
         description="Anyhing less than 10 characters is more reasonable c:"
+    )
+    return embed
+
+def owners(ctx):
+    with open(files.owners_loc(), 'r') as r:
+        owner_list = json.load(r)
+    embed=discord.Embed()
+    for owner in owner_list['DISCORD_IDS']:
+        embed.add_field(
+            name=owner["name"] + "#" + owner["discrim"],
+            value="ID: ``" + str(owner["id"]) + "``",
+            inline=False
+        )
+    return embed
+
+def global_dm_message(ctx, dm_msg):
+    embed=discord.Embed(
+        title="Hello!",
+        description="If you're getting this DM, you currently have a running reminder\n\n" + dm_msg
     )
     return embed
 

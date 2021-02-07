@@ -3,6 +3,7 @@ import os
 import io
 import json
 import glob
+from pathlib import Path
 
 script_dir = ''
 
@@ -25,7 +26,7 @@ def make_config(path):
     config = configparser.ConfigParser()
     if not os.path.exists(path):
         config['discord'] = {'token': '', 'default_prefix': '!'}
-        config['python'] = {'generate_logs': True}
+        config['python'] = {'generate_logs': True, 'enable_curses': False}
         config.write(open(path, 'w'))
         print('Config generated. Please edit it with your token.')
         quit()
@@ -37,7 +38,8 @@ def make_prefixes(path):
 def make_owners(path, bot):
     if not os.path.exists(path):
         ids = {"DISCORD_IDS": []}
-        ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, 'id': bot.appinfo.owner.id})
+        discrim = str(bot.appinfo.owner).replace(str(bot.appinfo.owner.name) + "#", '')
+        ids["DISCORD_IDS"].append({"name": bot.appinfo.owner.name, "discrim": discrim, "id": bot.appinfo.owner.id})
         make_json(path, ids)
 
 def make_dir(path):
@@ -61,5 +63,15 @@ def get_json(key, path):
     arr = []
     for file in glob.glob(path + str(key) + '*.json'):
         arr.append(file)
+    return arr
+
+def get_json_userids(path):
+    """very specific use but no better place to put it"""
+    arr = []
+    for file in glob.glob(path + '*.json'):
+        str = Path(file).stem
+        userid = str[0 : str.index('_')]
+        if int(userid) not in arr:
+            arr.append(int(userid))
     return arr
 # consider moving other writing operations here at the end of dev

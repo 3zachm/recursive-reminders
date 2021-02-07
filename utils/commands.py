@@ -3,6 +3,8 @@ import utils.file_manager as files
 
 help_help = "Shows this help menu"
 help_args = ""
+owners_help = "Lists bot owner name and IDs"
+owners_args = ""
 prefix_help = "Shows current prefix or changes it to the given argument"
 prefix_args = "[prefix]"
 reminder_help = "Base command (alias works with subcommands)"
@@ -13,6 +15,9 @@ reminder_list_help = "Displays all your current reminders and their current IDs"
 reminder_list_args = ""
 reminder_stop_help = "Stops the reminder ID which can be seen in your list"
 reminder_stop_args = "[id]"
+
+# hide commands from help menu generator
+hide_help = ['system', 'system pt']
 
 def owner_check(ctx):
     with open(files.owners_loc(), 'r') as r:

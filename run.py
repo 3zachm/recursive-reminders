@@ -9,6 +9,7 @@ import time
 import atexit
 from asyncio.coroutines import coroutine
 from threading import Event
+from discord.errors import Forbidden
 from discord.ext import commands, tasks
 from datetime import date
 import utils.embed_generator as embeds
@@ -36,6 +37,8 @@ config.read_file(io.StringIO(discord_config))
 try:
     default_prefix = config.get('discord', 'default_prefix')
     generate_logs = config.getboolean('python', 'generate_logs')
+    bot_token = config.get('discord', 'token')
+    tmp_screen = config.getboolean('python', 'enable_curses')
 except (configparser.NoSectionError, configparser.NoOptionError) as e:
     print(e)
     print("Ensure config file has all entries present. If you recently pulled an update, consider regenerating the config")
@@ -67,11 +70,11 @@ def get_prefix(bot, message):
         pfx = prefixes[str(message.guild.id)]
     return pfx
 
-bot_token = config.get('discord', 'token')
 bot = commands.Bot(command_prefix = get_prefix)
 bot.remove_command('help')
 bot.coroutineList = []
-use_screen = True
+bot.reset_warning = False
+use_screen = tmp_screen
 
 @bot.event
 async def on_ready():
@@ -81,7 +84,7 @@ async def on_ready():
     files.make_owners(files.owners_loc(), bot)
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="booting..."))
     # start periodic presence update
-    asyncio.create_task(update_presence())
+    bot.presence_routine = asyncio.create_task(update_presence())
     if use_screen:
         asyncio.create_task(screen.loop(bot))
     else:
@@ -96,6 +99,8 @@ async def on_guild_join(guild):
 @bot.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CommandNotFound):
+        return
+    if isinstance(error, commands.errors.CheckFailure):
         return
     if isinstance(error, commands.errors.MissingPermissions) and ctx.guild is None:
         return
@@ -148,6 +153,41 @@ async def on_message(message):
 @bot.command(name="help", help=cmds.help_help, description=cmds.help_args)
 async def help(ctx):
     await embeds.help(ctx, guild_prefix(ctx), bot)
+
+@bot.command(name="owners", help=cmds.owners_help, description=cmds.owners_args)
+async def owners(ctx):
+    await ctx.send(embed=embeds.owners(ctx))
+
+@bot.group(name="system", aliases=["sys"], invoke_without_command=True)
+@commands.check(cmds.owner_check)
+async def system(ctx):
+    pass
+
+@system.command(name="pt")
+async def system_pt(ctx):
+    if cmds.owner_check(ctx):
+        await ctx.send("You have owner permissions.")
+
+@system.command(name="fstop")
+@commands.check(cmds.owner_check)
+async def system_fstop(ctx, rq_ID):
+    requests.remove(files.request_dir(), int(rq_ID), bot.coroutineList)
+    await ctx.send("Successfully stopped.")
+
+@system.command(name="global_dm")
+@commands.check(cmds.owner_check)
+async def system_global_dm(ctx, *, dm_msg):
+    bot.reset_warning = True
+    bot.presence_routine.cancel()
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="reseting soon!"))
+    rqs = files.get_json_userids(files.request_dir())
+    embed = embeds.global_dm_message(ctx, dm_msg)
+    for uid in rqs:
+        user = await bot.fetch_user(uid)
+        try:
+            await user.send(embed=embed)
+        except Forbidden:
+            pass
 
 @bot.command(name="prefix", help=cmds.prefix_help, description=cmds.prefix_args)
 @commands.has_permissions(administrator=True)
@@ -202,6 +242,9 @@ async def reminder_add(ctx, t, *, rqname):
         rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t, guild_name)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
+        if bot.reset_warning:
+            await ctx.send("**Please note that a reset is expected to happen soon! Don't rely on this timer for the next hour or so**" + 
+            "\nThe bot's presence will return to normal when it's been reset")
         timer_task = asyncio.create_task(timer(ctx, rq_json), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])
 
@@ -230,7 +273,6 @@ async def reminder_stop(ctx, request):
             embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
         await ctx.send(embed=embed)
 
-# add information for embed
 async def timer(ctx, rq_json):
     t = rq_json["time"]
     react = None
