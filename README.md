@@ -2,8 +2,9 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders) [![Maintainability](https://api.codeclimate.com/v1/badges/047a379134cb872d9743/maintainability)](https://codeclimate.com/github/3zachm/recursive-reminders/maintainability)
 
-**Public soon!** (getting a VPS tomorrow, I need one for other things anyways)\
-Global default prefix is ! but can be changed in generated config.
+Public invite [here](https://3zachm.dev/youmu/)!
+
+Global default prefix is ``!`` but can be changed in generated config.
 
 ## Commands
 
@@ -19,3 +20,7 @@ Reminders have AFK checks in place that require a reaction before the next ping 
 Likewise, you can also stop them with a reaction.
 
 ![Timer example](https://i.imgur.com/vLQk9oQ.png)
+
+## Requirements
+
+Built on **Python 3.9.0** with the packages in ``requirements.txt``
