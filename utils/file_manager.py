@@ -69,8 +69,8 @@ def get_json_userids(path):
     """very specific use but no better place to put it"""
     arr = []
     for file in glob.glob(path + '*.json'):
-        str = Path(file).stem
-        userid = str[0 : str.index('_')]
+        file_str = Path(file).stem
+        userid = file_str[0 : file_str.index('_')]
         if int(userid) not in arr:
             arr.append(int(userid))
     return arr
