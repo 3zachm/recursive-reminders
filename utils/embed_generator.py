@@ -23,7 +23,8 @@ async def help(ctx, pfx, bot):
     for page in cmd_pages:
         embed=discord.Embed(
             title="**Commands**",
-            description="See a more presentable help list here: (link WIP)"
+            description="See a more presentable help list here: (link WIP)",
+            color=0xa277ad
         )
         embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(cmd_pages)))
         try:
@@ -53,7 +54,8 @@ async def help(ctx, pfx, bot):
 def reminder_base(ctx, pfx, bot):
     embed=discord.Embed(
         title="Reminder commands:",
-        description="Make mulltiple recursive reminders up to 12 hour intervals"
+        description="Make mulltiple recursive reminders up to 12 hour intervals",
+        color=0xa277ad
     )
     cmd_list = [bot.get_command('reminder add'), bot.get_command('reminder list'), bot.get_command('reminder stop')]
     for cmd in cmd_list:
@@ -170,6 +172,15 @@ def reminder_add_missing(ctx, pfx, bot):
         name=pfx + str(cmd) + " " + cmd.description,
         value=cmd.help + "\n\nExample: ``!r add 20 Raid`` creates a 20 minute timer named Raid",
         inline=False
+    )
+    return embed
+
+def reminder_list_length(ctx):
+    embed=discord.Embed(
+        title="You have too many reminders! (10)",
+        description="That's a lot :c Can you remove one before adding this one?\n" +
+        "More will be allowed in the future when I can give this thing more power c:",
+        color=0xcc0000
     )
     return embed
 

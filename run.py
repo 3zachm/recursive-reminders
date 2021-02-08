@@ -232,6 +232,9 @@ async def reminder_add(ctx, t, *, rqname):
         await ctx.send("You don't need a 0 minute timer :)")
     elif t < 0:
         await ctx.send("Counting by negatives seems dangerous")
+    elif len(requests.retrieve_list(ctx.author.id, files.request_dir())) > 9:
+        embed = embeds.reminder_list_length(ctx)
+        await ctx.send(embed=embed)
     else:
         t = int(t) * 60
         user = ctx.message.author
