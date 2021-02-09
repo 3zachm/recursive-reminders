@@ -3,6 +3,8 @@ import utils.file_manager as files
 
 help_help = "Shows this help menu"
 help_args = ""
+invite_help = "Gives link to invite the bot"
+invite_args = ""
 owners_help = "Lists bot owner name and IDs"
 owners_args = ""
 prefix_help = "Shows current prefix or changes it to the given argument"

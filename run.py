@@ -210,6 +210,10 @@ async def prefix(ctx, prefix=None):
         embed = embeds.prefix_change(ctx, prefix)
         await ctx.send(embed=embed)
 
+@bot.command(name="invite", help=cmds.invite_help, description=cmds.invite_args)
+async def invite(ctx):
+    await ctx.send(embed=embeds.invite_link(ctx))
+
 @bot.group(name="reminder", aliases=["r"], invoke_without_command=True, help=cmds.reminder_help, description=cmds.reminder_args)
 async def reminder(ctx):
     embed = embeds.reminder_base(ctx, guild_prefix(ctx), bot)

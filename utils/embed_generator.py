@@ -23,7 +23,8 @@ async def help(ctx, pfx, bot):
     for page in cmd_pages:
         embed=discord.Embed(
             title="**Commands**",
-            description="See a more presentable help list here: (link WIP)",
+            description="See a more presentable help list here: (link WIP)" +
+            "\nCommands work in DMs and are prefix-less",
             color=0xa277ad
         )
         embed.set_footer(text="Page " + str(page_count + 1) + "/" + str(len(cmd_pages)))
@@ -290,6 +291,14 @@ def prefix_length(ctx):
     embed=discord.Embed(
         title="That prefix is too long",
         description="Anyhing less than 10 characters is more reasonable c:"
+    )
+    return embed
+
+def invite_link(ctx):
+    embed=discord.Embed(
+        title=None,
+        description="**You can invite me through here:\nhttps://3zachm.dev/youmu**",
+        color=0xa277ad
     )
     return embed
 
