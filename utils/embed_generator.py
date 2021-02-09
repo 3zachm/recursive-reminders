@@ -228,7 +228,16 @@ def timer_continue(ctx, rq_json):
 async def timer_react(ctx, embed):
     bot = ctx.bot
     reaction = None
-    message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
+    # if channel is deleted, delete the reminder and pass if it's already deleted
+    try:
+        message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
+    except discord.errors.NotFound:
+        try:
+            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+            return
+        except IndexError:
+            return
+
     rq_continue = False
     rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, ctx.message.id)
     # 5 second grace to ensure it cancels
@@ -250,6 +259,8 @@ async def timer_react(ctx, embed):
                 await ctx.send(embed=reminder_cancel(ctx, rq_json))
             except IndexError:
                 pass
+            except discord.errors.NotFound:
+                return
             
             
     except asyncio.TimeoutError:
@@ -258,6 +269,8 @@ async def timer_react(ctx, embed):
             await ctx.send(embed=reminder_cancel_timeout(ctx, rq_json))
         except IndexError:
             pass
+        except discord.errors.NotFound:
+            return
 
     if rq_continue:
         await ctx.send(embed=timer_continue(ctx, rq_json))
