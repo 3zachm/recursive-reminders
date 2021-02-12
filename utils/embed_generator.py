@@ -266,7 +266,7 @@ async def timer_react(ctx, embed):
     except asyncio.TimeoutError:
         try:
             requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
-            await ctx.send(embed=reminder_cancel_timeout(ctx, rq_json))
+            await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
         except IndexError:
             pass
         except discord.errors.NotFound:
