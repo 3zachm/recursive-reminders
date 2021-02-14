@@ -135,7 +135,7 @@ async def reminder_list(ctx, rqs):
     if len(rq_pages) == 0:
         embed=discord.Embed(
            title="**Reminders**",
-           description="You have no active reminders" 
+           description="You have no active reminders"
         )
         embed.set_author(name=user.name, icon_url=user.avatar_url)
         embed.set_footer(text="Page 0/0")
@@ -155,8 +155,8 @@ async def reminder_list(ctx, rqs):
             return embed
         for rq in rq_page:
             embed.add_field(
-                name="#" + str(rq_number) + " | " + rq['name'], 
-                value="Length: " + str(rq['time']/60) + "m", 
+                name="#" + str(rq_number) + " | " + rq['name'],
+                value="Length: " + str(rq['time']/60) + "m",
                 inline=False
             )
             rq_number += 1

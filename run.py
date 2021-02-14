@@ -134,7 +134,7 @@ async def on_message(message):
                 embed = embeds.prefix_dms(ctx)
                 await ctx.send(embed=embed)
             # if mention is first and has a space after it
-            elif first_mention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator: 
+            elif first_mention == (f'<@!{bot.user.id}>') and ctx.message.author.guild_permissions.administrator:
                 index = msg.index(' ')
                 await prefix(ctx, msg[index + 1 : index + 2]) # i'm bad at python?
             else:
@@ -199,7 +199,6 @@ async def prefix(ctx, prefix=None):
         prefixes[str(ctx.guild.id)] = prefix
         with open(files.prefix_loc(), 'w') as w:
             json.dump(prefixes, w, indent=4)
-        user = ctx.message.author
         if prefix == '':
             prefix = 'None'
         embed = embeds.prefix_change(ctx, prefix)

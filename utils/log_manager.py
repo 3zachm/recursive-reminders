@@ -1,6 +1,5 @@
 import logging
 import time
-import os
 import utils.file_manager as files
 
 def init_logs(path):
