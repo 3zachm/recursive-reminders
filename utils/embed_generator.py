@@ -214,8 +214,6 @@ async def timer_end(ctx, pfx, rq_json):
     await timer_react(ctx, embed)
 
 def timer_continue(ctx, rq_json):
-    t = rq_json["time"]
-    rq_name = rq_json["name"]
     user = ctx.message.author
     embed=discord.Embed(
         title="Your reminder will continue  ✅",
@@ -261,8 +259,7 @@ async def timer_react(ctx, embed):
                 pass
             except discord.errors.NotFound:
                 return
-            
-            
+
     except asyncio.TimeoutError:
         try:
             requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
@@ -279,7 +276,7 @@ async def timer_react(ctx, embed):
 def prefix_current(ctx, pfx):
     embed=discord.Embed(
         title="My prefix is ``" + pfx + "`` for this guild",
-        description="If you have prefix conflicts, mention me followed by a new prefix!" + 
+        description="If you have prefix conflicts, mention me followed by a new prefix!" +
         "\nOnly single letter prefixes can be applied this way for exception reasons",
         color=0x00CC66
     )

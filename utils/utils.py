@@ -1,5 +1,5 @@
 def return2DIndex(key, arr):
-    """Returns the first index of a 2D array for the first 
+    """Returns the first index of a 2D array for the first
     occurence of the object/variable anywhere in the array.
 
     Parameters
@@ -32,5 +32,5 @@ def split_array(l, n):
     :class:`list`
         The 2D array resulting from the chunks.
     """
-    for i in range(0, len(l), n):  
-        yield l[i:i + n] 
+    for i in range(0, len(l), n):
+        yield l[i:i + n]

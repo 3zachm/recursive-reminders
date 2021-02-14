@@ -1,6 +1,5 @@
 import asyncio
 import curses
-import discord
 
 def print_counts(bot):
     bot.stdscr.addstr(0, 0, "Guilds: " + str(len(bot.guilds)))

@@ -1,8 +1,4 @@
-import asyncio
 import json
-import io
-import discord
-from asyncio.coroutines import coroutine
 import utils.file_manager as files
 import utils.utils as utils
 

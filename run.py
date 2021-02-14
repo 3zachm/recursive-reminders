@@ -1,17 +1,12 @@
-import datetime
 import discord
 import configparser
 import os
 import io
 import asyncio
 import json
-import time
 import atexit
-from asyncio.coroutines import coroutine
-from threading import Event
 from discord.errors import Forbidden
-from discord.ext import commands, tasks
-from datetime import date
+from discord.ext import commands
 import utils.embed_generator as embeds
 import utils.file_manager as files
 import utils.log_manager as logs
@@ -113,7 +108,7 @@ async def on_command_error(ctx, error):
             return
     # unhandled exception occurred
     if isinstance(error, commands.errors.CommandInvokeError):
-        await ctx.send("**An unhandled exception occurred:** ``" + repr(error) + 
+        await ctx.send("**An unhandled exception occurred:** ``" + repr(error) +
         "``\nThis has been logged. DM ``3zachm#9999`` if the error persists or you know how you broke the bot c:")
     if generate_logs:
         logs.exception(ctx, error, logger)
@@ -194,7 +189,7 @@ async def system_global_dm(ctx, *, dm_msg):
 async def prefix(ctx, prefix=None):
     if prefix is None:
         embed = embeds.prefix_current(ctx, guild_prefix(ctx))
-        await ctx.send(embed=embed) 
+        await ctx.send(embed=embed)
     elif len(prefix) > 10:
         embed = embeds.prefix_length(ctx)
         await ctx.send(embed=embed)
@@ -250,7 +245,7 @@ async def reminder_add(ctx, t, *, rqname):
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
         if bot.reset_warning:
-            await ctx.send("**Please note that a reset is expected to happen soon! Don't rely on this timer for the next hour or so**" + 
+            await ctx.send("**Please note that a reset is expected to happen soon! Don't rely on this timer for the next hour or so**" +
             "\nThe bot's presence will return to normal when it's been reset")
         timer_task = asyncio.create_task(timer(ctx, rq_json), name=ctx.message.id)
         bot.coroutineList.append([ctx.message.id, timer_task])

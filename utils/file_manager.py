@@ -1,6 +1,5 @@
 import configparser
 import os
-import io
 import json
 import glob
 from pathlib import Path
