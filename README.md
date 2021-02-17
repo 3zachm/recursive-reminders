@@ -24,3 +24,5 @@ Likewise, you can also stop them with a reaction.
 ## Requirements
 
 Built on **Python 3.9.0**, get ``discord.py`` and ``windows-curses`` if needed
+
+Eval is **hardcoded** with a user ID for security in commands.py and evaluate(), so if you're self-hosting change that

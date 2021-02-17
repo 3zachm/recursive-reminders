@@ -13,6 +13,7 @@ import utils.log_manager as logs
 import utils.request_manager as requests
 import utils.commands as cmds
 import utils.screen as screen
+import utils.eval as evalu
 
 config = configparser.ConfigParser()
 files.script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -108,8 +109,7 @@ async def on_command_error(ctx, error):
             return
     # unhandled exception occurred
     if isinstance(error, commands.errors.CommandInvokeError):
-        await ctx.send("**An unhandled exception occurred:** ``" + repr(error) +
-        "``\nThis has been logged. DM ``3zachm#9999`` if the error persists or you know how you broke the bot c:")
+        await ctx.send(embed=embeds.unhandled(ctx, error))
     if generate_logs:
         logs.exception(ctx, error, logger)
     else:
@@ -183,6 +183,40 @@ async def system_global_dm(ctx, *, dm_msg):
             await user.send(embed=embed)
         except Forbidden:
             pass
+
+# modified from Copyright (c) 2021 beeracademy (https://github.com/beeracademy/discord-bot)
+# thank you for being smarter than me <3
+@system.command(name="evaluate", aliases=["eval"])
+@commands.check(cmds.me_check)
+async def evaluate(ctx, *, stmts):
+    if ctx.message.author.id != 106188449643544576: # im checking twice idc
+        return
+    stmts = stmts.strip().replace("```python", "```").strip("`")
+    # not like the filesystem or uptime of my pi matters much anyways, would be more concerned about my account
+    exit_str = ["/", "\\", "..", "5c", "2f", "2e"]
+    if any(exit_strs in stmts for exit_strs in exit_str):
+        await ctx.send("```Direct file operation-related characters not allowed```")
+        return    
+    
+    if not stmts:
+        await ctx.send("After stripping `'s, stmts can't be empty.")
+        return
+
+    res = await evalu.eval_stmts(stmts, {"bot": bot, "ctx": ctx})
+    escaped = evalu.code_block_escape(repr(res))
+    message = f"```python\n{escaped}\n```"
+    if len(message) > 2000:
+        prefix = "Truncated result to length 0000:\n"
+        suffix = "\n```"
+        message = message.rstrip("`").strip()
+
+        new_length = 2000 - len(prefix) - len(suffix)
+        prefix = prefix.replace("0000", str(new_length))
+        message = prefix + message[:new_length] + suffix
+
+        await ctx.send(message)
+    else:
+        await ctx.send(message)
 
 @bot.command(name="prefix", help=cmds.prefix_help, description=cmds.prefix_args)
 @commands.has_permissions(administrator=True)

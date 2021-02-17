@@ -331,6 +331,17 @@ def global_dm_message(ctx, dm_msg):
     )
     return embed
 
+def unhandled(ctx, error):
+    embed=discord.Embed(
+        title=None,
+        description="**An unhandled exception occurred!**" +
+        "\n```python\n" +
+        repr(error.original) +
+        "\n```"
+    )
+    embed.set_footer(text="Reporting features are WIP, but you may contact 3zachm#9999 if it persists")
+    return embed
+
 async def embed_pages(ctx, pages):
     if len(pages) < 2:
         await ctx.send(embed=pages[0])

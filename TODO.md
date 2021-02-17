@@ -44,3 +44,5 @@ Keeping track of what needs to be done c:
 ### Long-term
 
 - [ ] Logging/Support Server (log in a private support server)
+  - [ ] Report errors and provide reference IDs for unhandeled exceptions
+- [ ] Fix the VPS DM reaction error (still no idea why it broke, probably unrelated to code)

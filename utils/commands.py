@@ -19,7 +19,7 @@ reminder_stop_help = "Stops the reminder ID which can be seen in your list"
 reminder_stop_args = "[id]"
 
 # hide commands from help menu generator
-hide_help = ['system', 'system pt', 'system fstop', 'system global_dm']
+hide_help = ['system', 'system pt', 'system fstop', 'system global_dm', 'evaluate']
 
 def owner_check(ctx):
     with open(files.owners_loc(), 'r') as r:
@@ -27,4 +27,9 @@ def owner_check(ctx):
     for owner in owner_list['DISCORD_IDS']:
         if owner['id'] == ctx.message.author.id:
             return True
+    return False
+
+def me_check(ctx):
+    if ctx.message.author.id == 106188449643544576:
+        return True
     return False
