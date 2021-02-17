@@ -193,7 +193,7 @@ async def evaluate(ctx, *, stmts):
         return
     stmts = stmts.strip().replace("```python", "```").strip("`")
     # not like the filesystem or uptime of my pi matters much anyways, would be more concerned about my account
-    exit_str = ["/", "\\", "..", "5c", "2f", "2e"]
+    exit_str = ["/", "\\", "..", "5c", "2f", "2e", "bot_token"]
     if any(exit_strs in stmts for exit_strs in exit_str):
         await ctx.send("```Direct file operation-related characters not allowed```")
         return    
