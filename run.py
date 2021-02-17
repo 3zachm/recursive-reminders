@@ -35,6 +35,7 @@ try:
     generate_logs = config.getboolean('python', 'generate_logs')
     bot_token = config.get('discord', 'token')
     tmp_screen = config.getboolean('python', 'enable_curses')
+    enable_eval = config.getboolean('python', 'enable_eval')
 except (configparser.NoSectionError, configparser.NoOptionError) as e:
     print(e)
     print("Ensure config file has all entries present. If you recently pulled an update, consider regenerating the config")
@@ -187,7 +188,7 @@ async def system_global_dm(ctx, *, dm_msg):
 # modified from Copyright (c) 2021 beeracademy (https://github.com/beeracademy/discord-bot)
 # thank you for being smarter than me <3
 @system.command(name="evaluate", aliases=["eval"])
-@commands.check(cmds.me_check)
+@commands.check(cmds.eval_check)
 async def evaluate(ctx, *, stmts):
     if ctx.message.author.id != 106188449643544576: # im checking twice idc
         return

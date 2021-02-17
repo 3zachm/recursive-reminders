@@ -25,7 +25,7 @@ def make_config(path):
     config = configparser.ConfigParser()
     if not os.path.exists(path):
         config['discord'] = {'token': '', 'default_prefix': '!'}
-        config['python'] = {'generate_logs': True, 'enable_curses': False}
+        config['python'] = {'generate_logs': True, 'enable_curses': False, 'enable_eval': False}
         config.write(open(path, 'w'))
         print('Config generated. Please edit it with your token.')
         quit()

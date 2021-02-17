@@ -1,3 +1,5 @@
+import configparser
+import io
 import json
 import utils.file_manager as files
 
@@ -29,7 +31,13 @@ def owner_check(ctx):
             return True
     return False
 
-def me_check(ctx):
-    if ctx.message.author.id == 106188449643544576:
+def eval_check(ctx):
+    with open(files.config_loc()) as c:
+        discord_config = c.read()
+    config = configparser.RawConfigParser(allow_no_value=True)
+    config.read_file(io.StringIO(discord_config))
+    enable_eval = config.getboolean('python', 'enable_eval')
+
+    if ctx.message.author.id == 106188449643544576 and enable_eval:
         return True
     return False
