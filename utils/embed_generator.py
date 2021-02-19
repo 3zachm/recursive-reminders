@@ -171,7 +171,7 @@ def reminder_add_missing(ctx, pfx, bot):
     cmd = bot.get_command('reminder add')
     embed.add_field(
         name=pfx + str(cmd) + " " + cmd.description,
-        value=cmd.help + "\n\nExample: ``!r add 20 Raid`` creates a 20 minute timer named Raid",
+        value=cmd.help + "\n\nExample: ``" + pfx + "r add 20 Raid`` creates a 20 minute timer named Raid",
         inline=False
     )
     return embed
