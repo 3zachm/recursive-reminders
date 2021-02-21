@@ -19,6 +19,7 @@ async def help(ctx, pfx, bot):
     for cmd in bot.walk_commands():
         if str(cmd) not in hidden:
             cmd_list.append(cmd)
+    cmd_list.sort(key=lambda cmd: str(cmd))
     cmd_pages = list(utils.split_array(cmd_list, 10))
     for page in cmd_pages:
         embed=discord.Embed(
