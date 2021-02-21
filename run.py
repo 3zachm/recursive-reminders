@@ -197,8 +197,8 @@ async def evaluate(ctx, *, stmts):
     exit_str = ["/", "\\", "..", "5c", "2f", "2e", "bot_token"]
     if any(exit_strs in stmts for exit_strs in exit_str):
         await ctx.send("```Direct file operation-related characters not allowed```")
-        return    
-    
+        return
+
     if not stmts:
         await ctx.send("After stripping `'s, stmts can't be empty.")
         return
