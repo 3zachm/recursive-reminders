@@ -14,7 +14,7 @@ Global default prefix is ``!`` but can be changed in generated config.
 - ``!prefix [char/str]`` - Changes prefix, works on per-guild basis.
 - ``!help`` - Displays this in a cleaner format
 - ``!owners`` - Lists users in owners.json
-- ``!invite`` - Gives invite to bot (by default the public link, change as needed for now, will make client ID in config eventually)
+- ``!invite`` - Gives invite to bot (by default the public link, change as needed)
 - ``!ping|test`` - Returns discord message delay and heartbeat latency
 - ``!system|sys pt`` - Admin permission test
 - ``@bot_mention`` - Shows current guild prefix
