@@ -219,6 +219,15 @@ async def evaluate(ctx, *, stmts):
     else:
         await ctx.send(message)
 
+@bot.command(name="ping", aliases=["test"], help=cmds.ping_help, description=cmds.ping_args)
+async def ping(ctx):
+    latency = bot.latency*1000
+    sent_time = ctx.message.created_at
+    botmsg = await ctx.send("**Response Latency**: ``{0}ms``\n**Discord Latency**: ".format(round(latency, 0)))
+    botmsg_time = botmsg.created_at
+    msg_time = float((botmsg_time - sent_time).total_seconds()*1000)
+    await botmsg.edit(content=botmsg.content + " ``{0}ms``".format(round(msg_time, 0)))
+
 @bot.command(name="prefix", help=cmds.prefix_help, description=cmds.prefix_args)
 @commands.has_permissions(administrator=True)
 async def prefix(ctx, prefix=None):
