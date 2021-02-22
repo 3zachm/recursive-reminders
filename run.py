@@ -121,7 +121,7 @@ async def on_message(message):
     ctx = await bot.get_context(message)
     msg = message.content
     if ctx.guild is None and (message.content.startswith('!') or message.content.startswith('.')):
-        await ctx.send("I am prefix-less in DMs! Simply type the command like ``help``")
+        await ctx.send("I am prefix-less in DMs! Simply type the command like `help`")
     if bot.user.mentioned_in(message):
         if message.mention_everyone:
             return
@@ -223,10 +223,10 @@ async def evaluate(ctx, *, stmts):
 async def ping(ctx):
     latency = bot.latency*1000
     sent_time = ctx.message.created_at
-    botmsg = await ctx.send("**Response Latency**: ``{0}ms``\n**Discord Latency**: ".format(round(latency, 0)))
+    botmsg = await ctx.send("**Response Latency**: `{0}ms`\n**Discord Latency**: ".format(round(latency, 0)))
     botmsg_time = botmsg.created_at
     msg_time = float((botmsg_time - sent_time).total_seconds()*1000)
-    await botmsg.edit(content=botmsg.content + " ``{0}ms``".format(round(msg_time, 0)))
+    await botmsg.edit(content=botmsg.content + " `{0}ms`".format(round(msg_time, 0)))
 
 @bot.command(name="prefix", help=cmds.prefix_help, description=cmds.prefix_args)
 @commands.has_permissions(administrator=True)

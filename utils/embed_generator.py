@@ -36,10 +36,10 @@ async def help(ctx, pfx, bot):
         for cmd in cmd_page:
             alias = ""
             if len(cmd.aliases) > 0:
-                alias = "\nAlias: ``" + pfx
+                alias = "\nAlias: `" + pfx
                 for a in cmd.aliases:
                     alias += a + " "
-                alias = alias[:-1] + "``"
+                alias = alias[:-1] + "`"
             try:
                 embed.add_field(
                     name=pfx + str(cmd) + " " + cmd.description,
@@ -72,7 +72,7 @@ def reminder_set(ctx, pfx, t, rqname):
     user = ctx.message.author
     embed=discord.Embed(
         title="Success! You will be reminded every " + str(int(t/60)) + " minutes",
-        description='You created a recursive reminder for ``' + rqname + '``\nDo ``' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '`` to cancel current and further reminders',
+        description='You created a recursive reminder for `' + rqname + '`\nDo `' + pfx + "reminder|r stop " + cmds.reminder_stop_args + '` to cancel current and further reminders',
         timestamp = ctx.message.created_at, color = 0x00CC66
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -81,7 +81,7 @@ def reminder_set(ctx, pfx, t, rqname):
 def reminder_cancel(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
-        title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
+        title="Your reminder for `" + rq_json["name"] + "` was cancelled",
         color=0xcc0000
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -91,7 +91,7 @@ def reminder_cancel(ctx, rq_json):
 def reminder_cancel_timeout(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
-        title="Your reminder for ``" + rq_json["name"] + "`` was cancelled",
+        title="Your reminder for `" + rq_json["name"] + "` was cancelled",
         description="No reaction was received before the next reminder occurence",
         color=0xcc0000
     )
@@ -102,7 +102,7 @@ def reminder_cancel_index(ctx, pfx, rqID):
     user = ctx.message.author
     embed=discord.Embed(
         title="No reminder in your list matches ID " + str(rqID),
-        description="Check your current reminder IDs with ``" + pfx + "reminder|r list``",
+        description="Check your current reminder IDs with `" + pfx + "reminder|r list`",
         color=0xcc0000
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -112,7 +112,7 @@ def reminder_none(ctx, pfx):
     user = ctx.message.author
     embed=discord.Embed(
         title='You have no reminder in progress',
-        description='One can be made with ``' + pfx + "reminder|r add " + cmds.reminder_add_args + '``',
+        description='One can be made with `' + pfx + "reminder|r add " + cmds.reminder_add_args + '`',
         timestamp = ctx.message.created_at,
         color=0x6f02cf
     )
@@ -172,7 +172,7 @@ def reminder_add_missing(ctx, pfx, bot):
     cmd = bot.get_command('reminder add')
     embed.add_field(
         name=pfx + str(cmd) + " " + cmd.description,
-        value=cmd.help + "\n\nExample: ``" + pfx + "r add 20 Raid`` creates a 20 minute timer named Raid",
+        value=cmd.help + "\n\nExample: `" + pfx + "r add 20 Raid` creates a 20 minute timer named Raid",
         inline=False
     )
     return embed
@@ -204,10 +204,10 @@ async def timer_end(ctx, pfx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
         title=str(int(t/60)) + " minutes have passed!",
-        description="Your reminder for ``" + rq_name + "`` is up (id " + str(requests.get_index(user.id, files.request_dir(), rq_json) + 1) + ")"
+        description="Your reminder for `" + rq_name + "` is up (id " + str(requests.get_index(user.id, files.request_dir(), rq_json) + 1) + ")"
         "\n" +
-        "``React``  ✅  to confirm you aren't AFK by the next occurence" +
-        "\n``React``  ❌  to stop or do ``" + pfx + "reminder|r stop [id]``",
+        "`React`  ✅  to confirm you aren't AFK by the next occurence" +
+        "\n`React`  ❌  to stop or do `" + pfx + "reminder|r stop [id]`",
         color=0xedc707,
         timestamp=ctx.message.created_at
     )
@@ -218,7 +218,7 @@ def timer_continue(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
         title="Your reminder will continue  ✅",
-        description="You'll be reminded for ``" + rq_json["name"] + "`` again",
+        description="You'll be reminded for `" + rq_json["name"] + "` again",
         color=0x00CC66
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
@@ -276,7 +276,7 @@ async def timer_react(ctx, embed):
 
 def prefix_current(ctx, pfx):
     embed=discord.Embed(
-        title="My prefix is ``" + pfx + "`` for this guild",
+        title="My prefix is `" + pfx + "` for this guild",
         description="If you have prefix conflicts, mention me followed by a new prefix!" +
         "\nOnly single letter prefixes can be applied this way for exception reasons",
         color=0x00CC66
@@ -286,7 +286,7 @@ def prefix_current(ctx, pfx):
 def prefix_change(ctx, pfx):
     embed=discord.Embed(
         title="Success!",
-        description="Prefix changed to ``" + pfx + "``",
+        description="Prefix changed to `" + pfx + "`",
         color=0x00CC66
     )
     return embed
@@ -294,7 +294,7 @@ def prefix_change(ctx, pfx):
 def prefix_dms(ctx):
     embed=discord.Embed(
         title="I have no prefix for DMs!",
-        description="Simply send the command keyword like ``help``"
+        description="Simply send the command keyword like `help`"
     )
     return embed
 
@@ -320,7 +320,7 @@ def owners(ctx):
     for owner in owner_list['DISCORD_IDS']:
         embed.add_field(
             name=owner["name"] + "#" + owner["discrim"],
-            value="ID: ``" + str(owner["id"]) + "``",
+            value="ID: `" + str(owner["id"]) + "`",
             inline=False
         )
     return embed
@@ -388,5 +388,4 @@ async def remove_reactions(ctx, message):
         if ctx.guild is not None:
             await message.clear_reactions()
     except discord.Forbidden:
-        # replace with smthn formal
-        await ctx.send("I don't have permission to remove reactions :(\nPlease make sure I have the ``Manage Message`` permission")
+        await ctx.send("I don't have permission to remove reactions :(\nPlease make sure I have the `Manage Message` permission")
