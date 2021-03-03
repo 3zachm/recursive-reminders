@@ -19,9 +19,9 @@ reminder_add_help = "Adds a re-occuring reminder for the specified time under th
 reminder_add_args = "[mins] [name]"
 reminder_list_help = "Displays all your current reminders and their current IDs"
 reminder_list_args = ""
-reminder_move_help = "Moves specified request to the current channel or DM"
+reminder_move_help = "Moves specified request to the current channel or DM\nIf you have only one reminder, no ID is needed."
 reminder_move_args = "[id]"
-reminder_stop_help = "Stops the reminder ID which can be seen in your list\nIf you have only one reminder, no ID is needed"
+reminder_stop_help = "Stops the reminder ID which can be seen in your list\nIf you have only one reminder, no ID is needed.\nUsing `all` instead of an ID cancels all current reminders"
 reminder_stop_args = "[id]"
 
 # hide commands from help menu generator

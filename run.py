@@ -315,6 +315,18 @@ async def reminder_stop(ctx, request):
     try:
         request = int(request)
     except ValueError:
+        try:
+            if str(request) == "all":
+                rq_list = requests.retrieve_list(ctx.message.author.id, files.request_dir())
+                if len(rq_list) < 1:
+                    await ctx.send(embed=embeds.reminder_none(ctx, guild_prefix(ctx)))
+                    return
+                for rq in rq_list:
+                    requests.remove(files.request_dir(), rq['request'], bot.coroutineList)
+                await ctx.send(embed=embeds.reminder_cancel_all(ctx))
+                return
+        except ValueError:
+            pass
         await ctx.send(embed=embeds.reminder_stop_missing(ctx, guild_prefix(ctx), bot))
         return
     if requests.retrieve_list(user.id, files.request_dir()) == []:

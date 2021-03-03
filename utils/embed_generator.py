@@ -87,6 +87,14 @@ def reminder_cancel(ctx, rq_json):
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
     return embed
 
+def reminder_cancel_all(ctx):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="All reminders were cancelled successfully!",
+        color=0xcc0000
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
 
 def reminder_cancel_timeout(ctx, rq_json):
     user = ctx.message.author
