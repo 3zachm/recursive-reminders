@@ -19,11 +19,13 @@ reminder_add_help = "Adds a re-occuring reminder for the specified time under th
 reminder_add_args = "[mins] [name]"
 reminder_list_help = "Displays all your current reminders and their current IDs"
 reminder_list_args = ""
-reminder_stop_help = "Stops the reminder ID which can be seen in your list"
+reminder_move_help = "Moves specified request to the current channel or DM"
+reminder_move_args = "[id]"
+reminder_stop_help = "Stops the reminder ID which can be seen in your list\nIf you have only one reminder, no ID is needed"
 reminder_stop_args = "[id]"
 
 # hide commands from help menu generator
-hide_help = ['system', 'system pt', 'system fstop', 'system global_dm', 'evaluate']
+hide_help = ['system', 'system pt', 'system fstop', 'system global_dm', 'evaluate', 'help']
 
 def owner_check(ctx):
     with open(files.owners_loc(), 'r') as r:

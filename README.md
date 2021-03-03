@@ -10,8 +10,9 @@ Global default prefix is `!` but can be changed in generated config.
 
 - `!reminder|r add [minutes (int)] [name (string)]` - Sends a ping to the user every given minute(s)
 - `!reminder|r list` - Shows list of all current reminders
-- `!reminder|r stop [id]` - Stops the reminder loop and any in-progress timer for the user.
-- `!prefix [char/str]` - Changes prefix, works on per-guild basis.
+- `!reminder|r move [id]` - Moves the reminder to the current channel/DM (ID not needed if only one reminder)
+- `!reminder|r stop [id]` - Stops the reminder loop and any in-progress timer for the user (ID not needed if only one reminder)
+- `!prefix [char/str]` - Changes prefix, works on per-guild basis
 - `!help` - Displays this in a cleaner format
 - `!owners` - Lists users in owners.json
 - `!invite` - Gives invite to bot (by default the public link, change as needed)

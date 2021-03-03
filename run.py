@@ -106,7 +106,16 @@ async def on_command_error(ctx, error):
             await ctx.send(embed=embeds.reminder_add_missing(ctx, guild_prefix(ctx), bot))
             return
         if str(ctx.command) == "reminder stop":
+            if len(requests.retrieve_list(ctx.author.id, files.request_dir())) == 1:
+                await reminder_stop(ctx, 1)
+                return
             await ctx.send(embed=embeds.reminder_stop_missing(ctx, guild_prefix(ctx), bot))
+            return
+        if str(ctx.command) == "reminder move":
+            if len(requests.retrieve_list(ctx.author.id, files.request_dir())) == 1:
+                await reminder_move(ctx, 1)
+                return
+            await ctx.send(embed=embeds.reminder_move_missing(ctx, guild_prefix(ctx), bot))
             return
     # unhandled exception occurred
     if isinstance(error, commands.errors.CommandInvokeError):
@@ -282,9 +291,11 @@ async def reminder_add(ctx, t, *, rqname):
         user = ctx.message.author
         if ctx.guild is None:
             guild_name = ""
+            channel = 1
         else:
             guild_name = ctx.guild.name
-        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t, guild_name)
+            channel = ctx.channel.id
+        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t, guild_name, channel)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
         if bot.reset_warning:
@@ -318,6 +329,27 @@ async def reminder_stop(ctx, request):
             embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
         await ctx.send(embed=embed)
 
+@reminder.command(name="move", help=cmds.reminder_move_help, description=cmds.reminder_move_args)
+async def reminder_move(ctx, request):
+    try:
+        request = int(request)
+    except ValueError:
+        await ctx.send(embed=embeds.reminder_move_missing(ctx))
+        return
+    try:
+        rq_json = requests.retrieve_json(ctx.author.id, files.request_dir(), request)
+        if ctx.guild is None:
+            channel = 1
+            guild = ""
+        else:
+            channel = ctx.channel.id
+            guild = ctx.guild.name
+        requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'channel', channel)
+        rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'guild', guild)
+        await ctx.send(embed=embeds.reminder_move_success(ctx, rq_new_json))
+    except IndexError:
+        await ctx.send(embed=embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request))
+
 async def timer(ctx, rq_json):
     t = rq_json["time"]
     react = None
@@ -325,6 +357,7 @@ async def timer(ctx, rq_json):
         await asyncio.sleep(t)
         if react is not None:
             react.cancel()
+        rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, rq_json['request'])
         react = asyncio.create_task(embeds.timer_end(ctx, guild_prefix(ctx), rq_json))
 
 async def update_presence():

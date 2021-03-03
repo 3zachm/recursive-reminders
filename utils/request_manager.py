@@ -3,8 +3,8 @@ import utils.file_manager as files
 import utils.utils as utils
 
 
-def create(loc, userid, request, rqname, time, guild_name):
-    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name}
+def create(loc, userid, request, rqname, time, guild_name, channel):
+    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name, "channel": channel}
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
     return data
 
@@ -39,3 +39,13 @@ def retrieve_json(userid, path, request):
     with open(request_json, 'r') as r:
         request = json.load(r)
     return request
+
+def edit_json_val(userid, path, request_id, key, value):
+    rq_json = files.get_json(str(userid) + "_" + str(request_id), path)[0]
+    with open(rq_json, 'r+') as w:
+        rq = json.load(w)
+        rq[key] = value
+        w.seek(0)
+        json.dump(rq, w, indent=4)
+        w.truncate()
+    return rq

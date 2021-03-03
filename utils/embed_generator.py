@@ -186,6 +186,28 @@ def reminder_list_length(ctx):
     )
     return embed
 
+def reminder_move_success(ctx, rq_json):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="Your reminder was moved successfully  ✅",
+        description="Reminder `" + rq_json["name"] + "` was moved here",
+        color=0x00CC66
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+def reminder_move_missing(ctx, pfx, bot):
+    embed=discord.Embed(
+        title="Missing requirements!",
+    )
+    cmd = bot.get_command('reminder move')
+    embed.add_field(
+        name=pfx + str(cmd) + " " + cmd.description,
+        value="Specify an ID to move, which can be found in the reminder list\nIf you have only one reminder, no ID is needed",
+        inline=False
+    )
+    return embed
+
 def reminder_stop_missing(ctx, pfx, bot):
     embed=discord.Embed(
         title="Missing requirements!",
@@ -193,12 +215,31 @@ def reminder_stop_missing(ctx, pfx, bot):
     cmd = bot.get_command('reminder stop')
     embed.add_field(
         name=pfx + str(cmd) + " " + cmd.description,
-        value="Specify an ID to stop, which can be found in the reminder list",
+        value="Specify an ID to stop, which can be found in the reminder list\nIf you have only one reminder, no ID is needed",
         inline=False
     )
     return embed
 
 async def timer_end(ctx, pfx, rq_json):
+    channel = rq_json["channel"]
+    bot = ctx.bot
+    try:
+        # 1 = DM
+        if channel == 1:
+            channel = await ctx.author.create_dm()
+            ctx.channel = channel
+            ctx.guild = None
+        else:
+            channel = await bot.fetch_channel(channel)
+            ctx.channel = channel
+            ctx.guild = channel.guild
+    except (discord.errors.NotFound, discord.errors.Forbidden) as e:
+        try:
+            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+            return
+        except IndexError:
+            return
+
     t = rq_json["time"]
     rq_name = rq_json["name"]
     user = ctx.message.author
@@ -230,7 +271,7 @@ async def timer_react(ctx, embed):
     # if channel is deleted, delete the reminder and pass if it's already deleted
     try:
         message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
-    except discord.errors.NotFound:
+    except (discord.errors.NotFound, discord.errors.Forbidden) as e:
         try:
             requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
             return
@@ -258,7 +299,7 @@ async def timer_react(ctx, embed):
                 await ctx.send(embed=reminder_cancel(ctx, rq_json))
             except IndexError:
                 pass
-            except discord.errors.NotFound:
+            except (discord.errors.NotFound, discord.errors.Forbidden):
                 return
 
     except asyncio.TimeoutError:
@@ -267,7 +308,7 @@ async def timer_react(ctx, embed):
             await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
         except IndexError:
             pass
-        except discord.errors.NotFound:
+        except (discord.errors.NotFound, discord.errors.Forbidden):
             return
 
     if rq_continue:
