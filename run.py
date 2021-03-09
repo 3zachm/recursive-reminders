@@ -289,13 +289,7 @@ async def reminder_add(ctx, t, *, rqname):
     else:
         t = int(t) * 60
         user = ctx.message.author
-        if ctx.guild is None:
-            guild_name = ""
-            channel = 1
-        else:
-            guild_name = ctx.guild.name
-            channel = ctx.channel.id
-        rq_json = requests.create(files.request_dir(), user.id, ctx.message.id, rqname, t, guild_name, channel)
+        rq_json = requests.create(ctx, files.request_dir(), rqname, t)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)
         if bot.reset_warning:
@@ -357,6 +351,7 @@ async def reminder_move(ctx, request):
             channel = ctx.channel.id
             guild = ctx.guild.name
         requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'channel', channel)
+        requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'source', ctx.message.id)
         rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'guild', guild)
         await ctx.send(embed=embeds.reminder_move_success(ctx, rq_new_json))
     except IndexError:
@@ -374,7 +369,7 @@ async def timer(ctx, rq_json):
 
 async def update_presence():
     while(True):
-        await asyncio.sleep(180)
+        await asyncio.sleep(120)
         rqs_len = len(bot.coroutineList)
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=str(rqs_len) + " reminders"))
 

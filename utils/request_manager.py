@@ -3,8 +3,16 @@ import utils.file_manager as files
 import utils.utils as utils
 
 
-def create(loc, userid, request, rqname, time, guild_name, channel):
-    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name, "channel": channel}
+def create(ctx, loc, rqname, time):
+    userid = ctx.message.author.id
+    request = ctx.message.id
+    if ctx.guild is None:
+        guild_name = ""
+        channel = 1
+    else:
+        guild_name = ctx.guild.name
+        channel = ctx.channel.id
+    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name, "channel": channel, "source": request}
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
     return data
 
