@@ -275,45 +275,55 @@ def timer_continue(ctx, rq_json):
 
 async def timer_react(ctx, embed):
     bot = ctx.bot
+    current_ctx = ctx
     reaction = None
-    # if channel is deleted, delete the reminder and pass if it's already deleted
-    try:
-        message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
-    except (discord.errors.NotFound, discord.errors.Forbidden) as e:
-        try:
-            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
-            return
-        except IndexError:
-            return
-
-    rq_continue = False
     rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, ctx.message.id)
+    rq_continue = False
     # 5 second grace to ensure it cancels
     t = rq_json["time"] - 5
+    # if request was moved, we can't reply to it anymore
+    try:
+        og_message = await ctx.fetch_message(rq_json["source"])
+        ctx = await bot.get_context(og_message)
+        message = await ctx.reply(embed=embed)
+    except (discord.errors.Forbidden, discord.errors.NotFound, discord.errors.HTTPException) as e:
+        ctx = current_ctx
+        # if channel is deleted, delete the reminder and pass if it's already deleted
+        try:
+            message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
+        except (discord.errors.NotFound, discord.errors.Forbidden) as e:
+            try:
+                requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+                return
+            except IndexError:
+                return
 
     for emoji in confirm_control_emoji:
         await message.add_reaction(emoji)
 
     def check(reaction, user):
-        return reaction.message.id == message.id and user == ctx.author
+        return reaction.message.id == message.id and user.id == rq_json["user"]
 
     try:
         reaction, user = await bot.wait_for('reaction_add', timeout = t, check = check)
         if str(reaction) == '✅':
             rq_continue = True
         elif str(reaction) == '❌':
-            try:
-                requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
+            #try:
+                requests.remove(files.request_dir(), rq_json["request"], bot.coroutineList)
                 await ctx.send(embed=reminder_cancel(ctx, rq_json))
-            except IndexError:
-                pass
-            except (discord.errors.NotFound, discord.errors.Forbidden):
-                return
+            #except IndexError:
+            #    pass
+            #except (discord.errors.NotFound, discord.errors.Forbidden):
+            #    return
 
     except asyncio.TimeoutError:
         try:
-            requests.remove(files.request_dir(), ctx.message.id, bot.coroutineList)
-            await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
+            requests.remove(files.request_dir(), rq_json["request"], bot.coroutineList)
+            try:
+                await ctx.reply(embed=reminder_cancel_timeout(ctx, rq_json))
+            except (discord.errors.Forbidden, discord.errors.NotFound, discord.errors.HTTPException) as e:
+                await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
         except IndexError:
             pass
         except (discord.errors.NotFound, discord.errors.Forbidden):
