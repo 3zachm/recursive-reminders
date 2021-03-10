@@ -266,7 +266,7 @@ async def reminder(ctx):
     embed = embeds.reminder_base(ctx, guild_prefix(ctx), bot)
     await ctx.send(embed=embed)
 
-@reminder.command(name="add", help=cmds.reminder_add_help, description=cmds.reminder_add_args)
+@reminder.command(name="add", aliases=["create"], help=cmds.reminder_add_help, description=cmds.reminder_add_args)
 async def reminder_add(ctx, t, *, rqname):
     try:
         t = int(t)
@@ -303,7 +303,7 @@ async def reminder_list(ctx):
     requests_list = requests.retrieve_list(ctx.message.author.id, files.request_dir())
     await embeds.reminder_list(ctx, requests_list)
 
-@reminder.command(name="stop", help=cmds.reminder_stop_help, description=cmds.reminder_stop_args)
+@reminder.command(name="stop", aliases=["remove"], help=cmds.reminder_stop_help, description=cmds.reminder_stop_args)
 async def reminder_stop(ctx, request):
     user = ctx.message.author
     try:
