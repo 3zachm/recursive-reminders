@@ -1,3 +1,5 @@
+import psutil, time, datetime
+
 def return2DIndex(key, arr):
     """Returns the first index of a 2D array for the first
     occurence of the object/variable anywhere in the array.
@@ -34,3 +36,9 @@ def split_array(l, n):
     """
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+def get_sysuptime():
+    return datetime.timedelta(seconds=int(time.time() - psutil.boot_time()))
+
+def get_uptime(boot):
+    return datetime.timedelta(seconds=int(time.time() - boot))

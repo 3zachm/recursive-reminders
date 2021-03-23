@@ -19,6 +19,7 @@ Global default prefix is `!` but can be changed in generated config.
 - `!invite` - Gives invite to bot (by default the public link, change as needed)
 - `!ping|test` - Returns discord message delay and heartbeat latency
 - `!system|sys pt` - Admin permission test
+- `uptime` - Responds with uptime of server/bot
 - `@bot_mention` - Shows current guild prefix
 - `@bot_mention [char]` - Alternative prefix change
 
@@ -35,6 +36,6 @@ Likewise, you can also stop them with a reaction.
 
 ## Requirements
 
-Built on **Python 3.9.0**, get `discord.py` and `windows-curses` if needed
+Built on **Python 3.9.0**, get `discord.py`, `psutils` (for uptime), and `windows-curses` if needed
 
 Eval is **hardcoded** with a user ID for security in commands.py and evaluate(), so if you're self-hosting change that

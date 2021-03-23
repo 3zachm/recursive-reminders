@@ -5,6 +5,7 @@ import io
 import asyncio
 import json
 import atexit
+import datetime, time
 from discord.errors import Forbidden
 from discord.ext import commands
 import utils.embed_generator as embeds
@@ -14,7 +15,9 @@ import utils.request_manager as requests
 import utils.commands as cmds
 import utils.screen as screen
 import utils.eval as evalu
+import utils.utils as utils
 
+boot_time = time.time()
 config = configparser.ConfigParser()
 files.script_dir = os.path.dirname(os.path.realpath(__file__))
 files.delete_contents(files.request_dir())
@@ -227,6 +230,10 @@ async def evaluate(ctx, *, stmts):
         await ctx.send(message)
     else:
         await ctx.send(message)
+
+@bot.command(name="uptime", help=cmds.uptime_help, description=cmds.uptime_args)
+async def uptime(ctx):
+    await ctx.send("**Uptime**: `{0}`\n**Server**: `{1}`".format(utils.get_uptime(boot_time), utils.get_sysuptime()))
 
 @bot.command(name="ping", aliases=["test"], help=cmds.ping_help, description=cmds.ping_args)
 async def ping(ctx):

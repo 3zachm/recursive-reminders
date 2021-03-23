@@ -23,6 +23,8 @@ reminder_move_help = "Moves specified request to the current channel or DM\nIf y
 reminder_move_args = "[id]"
 reminder_stop_help = "Stops the reminder ID which can be seen in your list\nIf you have only one reminder, no ID is needed.\nUsing `all` instead of an ID cancels all current reminders"
 reminder_stop_args = "[id]"
+uptime_help = "Responds with uptime of the server and bot/shard"
+uptime_args = ""
 
 # hide commands from help menu generator
 hide_help = ['system', 'system pt', 'system fstop', 'system global_dm', 'evaluate', 'help']
