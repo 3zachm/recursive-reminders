@@ -5,7 +5,7 @@ import io
 import asyncio
 import json
 import atexit
-import datetime, time
+import time
 from discord.errors import Forbidden
 from discord.ext import commands
 import utils.embed_generator as embeds
@@ -295,7 +295,6 @@ async def reminder_add(ctx, t, *, rqname):
         await ctx.send(embed=embed)
     else:
         t = int(t) * 60
-        user = ctx.message.author
         rq_json = requests.create(ctx, files.request_dir(), rqname, t)
         embed = embeds.reminder_set(ctx, guild_prefix(ctx), t, rqname)
         await ctx.send(embed=embed)

@@ -53,7 +53,7 @@ async def help(ctx, pfx, bot):
         except IndexError:
             return embed
         for cmd in cmd_page:
-            if (type(cmd) == str):
+            if (isinstance(cmd, str)):
                 embed.add_field(
                     name="`" + cmd + "`",
                     value="----------------------------",
