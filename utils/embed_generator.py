@@ -11,16 +11,35 @@ all_control_emoji = ["⏮", "⬅️", "➡️", "⏭"]
 confirm_control_emoji = ["✅","❌"]
 
 async def help(ctx, pfx, bot):
+    # --------COMMAND GROUP CONSTURCTION--------
+    rmd_list = ["Reminders"]
+    #sys_list = ["System"]
+    msc_list = ["Misc"]
+    # ------------------------------------------
     cmd_list = []
-    hidden = cmds.hide_help
     embed_list = []
+    hidden = cmds.hide_help
     page_count = 0
     cmd_number = 1
     for cmd in bot.walk_commands():
         if str(cmd) not in hidden:
+            # --------Reminder--------
+            if 'reminder' in str(cmd):
+                rmd_list.append(cmd)
+            # --------System--------
+            #elif 'system' in str(cmd):
+            #    sys_list.append(cmd)
+            # --------Misc--------
+            else:
+                msc_list.append(cmd)
+    pre_list = [rmd_list, msc_list]
+    for group in pre_list:
+        group.sort(key=lambda cmd: str(cmd))
+    for group in pre_list:
+        for cmd in group:
             cmd_list.append(cmd)
-    cmd_list.sort(key=lambda cmd: str(cmd))
-    cmd_pages = list(utils.split_array(cmd_list, 10))
+
+    cmd_pages = list(utils.split_array(cmd_list, 8))
     for page in cmd_pages:
         embed=discord.Embed(
             title="**Commands**",
@@ -34,21 +53,28 @@ async def help(ctx, pfx, bot):
         except IndexError:
             return embed
         for cmd in cmd_page:
-            alias = ""
-            if len(cmd.aliases) > 0:
-                alias = "\nAlias: `" + pfx
-                for a in cmd.aliases:
-                    alias += a + " "
-                alias = alias[:-1] + "`"
-            try:
+            if (type(cmd) == str):
                 embed.add_field(
-                    name=pfx + str(cmd) + " " + cmd.description,
-                    value=cmd.help + alias,
+                    name="`" + cmd + "`",
+                    value="----------------------------",
                     inline=False
                 )
-                cmd_number += 1
-            except TypeError:
-                pass
+            else:
+                alias = ""
+                if len(cmd.aliases) > 0:
+                    alias = "\nAlias: `" + pfx
+                    for a in cmd.aliases:
+                        alias += a + " "
+                    alias = alias[:-1] + "`"
+                try:
+                    embed.add_field(
+                        name=pfx + str(cmd) + " " + cmd.description,
+                        value=cmd.help + alias,
+                        inline=False
+                    )
+                    cmd_number += 1
+                except TypeError:
+                    pass
         embed_list.append(embed)
         page_count += 1
     await embed_pages(ctx, embed_list)
