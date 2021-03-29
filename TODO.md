@@ -45,4 +45,5 @@ Keeping track of what needs to be done c:
 
 - [ ] Logging/Support Server (log in a private support server)
   - [ ] Report errors and provide reference IDs for unhandeled exceptions
-- [ ] Fix the VPS DM reaction error (still no idea why it broke, probably unrelated to code)
+- [x] Fix the DM reaction error
+  - Turns out it was a discord cache thing and I wasn't aware I had to use 'raw' events... oops... but it worked on my ARM64 Pi but not my x64 machine (both running ubuntu)....?? Oh well lmao

@@ -330,8 +330,16 @@ async def timer_react(ctx, embed):
     def check(reaction, user):
         return reaction.message.id == message.id and user.id == rq_json["user"]
 
+    def check_dm(payload):
+        return payload.message_id == message.id and payload.user_id == ctx.author.id
+
     try:
-        reaction, user = await bot.wait_for('reaction_add', timeout = t, check = check)
+        if ctx.guild is not None:
+            reaction, user = await bot.wait_for('reaction_add', timeout = t, check = check)
+        else:
+            payload = await bot.wait_for('raw_reaction_add', timeout = 30.0, check = check_dm)
+            reaction, user = payload.emoji, payload.user_id
+
         if str(reaction) == '✅':
             rq_continue = True
         elif str(reaction) == '❌':
@@ -442,23 +450,30 @@ async def embed_pages(ctx, pages):
     def check(reaction, user):
         return reaction.message.id == message.id and user == ctx.author
 
+    def check_dm(payload):
+        return payload.message_id == message.id and payload.user_id == ctx.author.id
+
     while(True):
         if str(reaction) == '⏮':
             pg = 0
-            await reaction.message.edit(embed = pages[pg])
+            await message.edit(embed = pages[pg])
         elif str(reaction) == '⬅️':
             if pg > 0:
                 pg -= 1
-                await reaction.message.edit(embed = pages[pg])
+                await message.edit(embed = pages[pg])
         elif str(reaction) == '➡️':
             if pg < len(pages) - 1:
                 pg += 1
-                await reaction.message.edit(embed = pages[pg])
+                await message.edit(embed = pages[pg])
         elif str(reaction) == '⏭':
             pg = len(pages) - 1
-            await reaction.message.edit(embed = pages[pg])
+            await message.edit(embed = pages[pg])
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
+            if ctx.guild is not None:
+                reaction, user = await bot.wait_for('reaction_add', timeout = 30.0, check = check)
+            else:
+                payload = await bot.wait_for('raw_reaction_add', timeout = 30.0, check = check_dm)
+                reaction, user = payload.emoji, payload.user_id
             try:
                 if ctx.guild is not None:
                     await message.remove_reaction(reaction, user)
