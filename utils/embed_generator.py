@@ -308,10 +308,11 @@ async def timer_react(ctx, embed):
     # 5 second grace to ensure it cancels
     t = rq_json["time"] - 5
     # if request was moved, we can't reply to it anymore
+    # TEMPORARILY CHANGED TO SEND BECAUSE SOMETHING BROKE AND I CANT FIGURE IT OUT
     try:
         og_message = await ctx.fetch_message(rq_json["source"])
         ctx = await bot.get_context(og_message)
-        message = await ctx.reply(embed=embed)
+        message = await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=embed)
     except (discord.errors.Forbidden, discord.errors.NotFound, discord.errors.HTTPException) as e:
         ctx = current_ctx
         # if channel is deleted, delete the reminder and pass if it's already deleted
@@ -355,7 +356,7 @@ async def timer_react(ctx, embed):
         try:
             requests.remove(files.request_dir(), rq_json["request"], bot.coroutineList)
             try:
-                await ctx.reply(embed=reminder_cancel_timeout(ctx, rq_json))
+                await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
             except (discord.errors.Forbidden, discord.errors.NotFound, discord.errors.HTTPException) as e:
                 await ctx.send("<@!" + str(ctx.message.author.id) + ">", embed=reminder_cancel_timeout(ctx, rq_json))
         except IndexError:
