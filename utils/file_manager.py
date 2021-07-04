@@ -59,10 +59,7 @@ def delete_contents(path):
         os.remove(file)
 
 def get_json(key, path):
-    arr = []
-    for file in glob.glob(path + str(key) + '*.json'):
-        arr.append(file)
-    return arr
+    return [file for file in glob.glob(path + str(key) + '*.json')]
 
 def get_json_userids(path):
     """very specific use but no better place to put it"""

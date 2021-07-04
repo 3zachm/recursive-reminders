@@ -227,9 +227,7 @@ async def evaluate(ctx, *, stmts):
         prefix = prefix.replace("0000", str(new_length))
         message = prefix + message[:new_length] + suffix
 
-        await ctx.send(message)
-    else:
-        await ctx.send(message)
+    await ctx.send(message)
 
 @bot.command(name="uptime", help=cmds.uptime_help, description=cmds.uptime_args)
 async def uptime(ctx):
@@ -249,10 +247,8 @@ async def ping(ctx):
 async def prefix(ctx, prefix=None):
     if prefix is None:
         embed = embeds.prefix_current(ctx, guild_prefix(ctx))
-        await ctx.send(embed=embed)
     elif len(prefix) > 10:
         embed = embeds.prefix_length(ctx)
-        await ctx.send(embed=embed)
     else:
         with open(files.prefix_loc(), 'r') as r:
             prefixes = json.load(r)
@@ -262,7 +258,7 @@ async def prefix(ctx, prefix=None):
         if prefix == '':
             prefix = 'None'
         embed = embeds.prefix_change(ctx, prefix)
-        await ctx.send(embed=embed)
+    await ctx.send(embed=embed)
 
 @bot.command(name="invite", help=cmds.invite_help, description=cmds.invite_args)
 async def invite(ctx):
@@ -329,9 +325,9 @@ async def reminder_stop(ctx, request):
             pass
         await ctx.send(embed=embeds.reminder_stop_missing(ctx, guild_prefix(ctx), bot))
         return
+
     if requests.retrieve_list(user.id, files.request_dir()) == []:
         embed=embeds.reminder_none(ctx, guild_prefix(ctx))
-        await ctx.send(embed=embed)
     else:
         try:
             rq_json = requests.retrieve_json(user.id, files.request_dir(), request)
@@ -339,7 +335,7 @@ async def reminder_stop(ctx, request):
             embed = embeds.reminder_cancel(ctx, rq_json)
         except IndexError:
             embed = embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request)
-        await ctx.send(embed=embed)
+    await ctx.send(embed=embed)
 
 @reminder.command(name="move", help=cmds.reminder_move_help, description=cmds.reminder_move_args)
 async def reminder_move(ctx, request):

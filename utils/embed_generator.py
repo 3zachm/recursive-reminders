@@ -19,7 +19,6 @@ async def help(ctx, pfx, bot):
     cmd_list = []
     embed_list = []
     hidden = cmds.hide_help
-    page_count = 0
     cmd_number = 1
     for cmd in bot.walk_commands():
         if str(cmd) not in hidden:
@@ -40,7 +39,7 @@ async def help(ctx, pfx, bot):
             cmd_list.append(cmd)
 
     cmd_pages = list(utils.split_array(cmd_list, 8))
-    for page in cmd_pages:
+    for page_count, page in enumerate(cmd_pages):
         embed=discord.Embed(
             title="**Commands**",
             description="See a more presentable help list here: (link WIP)" +
@@ -76,7 +75,6 @@ async def help(ctx, pfx, bot):
                 except TypeError:
                     pass
         embed_list.append(embed)
-        page_count += 1
     await embed_pages(ctx, embed_list)
 
 def reminder_base(ctx, pfx, bot):
@@ -164,10 +162,9 @@ async def reminder_list(ctx, rqs):
     user = ctx.message.author
     rq_pages = list(utils.split_array(rqs, 5))
     embed_list = []
-    page_count = 0
     rq_number = 1
     # make more efficient embed
-    if len(rq_pages) == 0:
+    if not rq_pages:
         embed=discord.Embed(
            title="**Reminders**",
            description="You have no active reminders"
@@ -176,7 +173,7 @@ async def reminder_list(ctx, rqs):
         embed.set_footer(text="Page 0/0")
         await ctx.send(embed=embed)
         return
-    for page in rq_pages:
+    for page_count, page in enumerate(rq_pages):
         embed=discord.Embed(
             title="**Reminders**",
             description="All your active reminders are shown below"
@@ -196,7 +193,6 @@ async def reminder_list(ctx, rqs):
             )
             rq_number += 1
         embed_list.append(embed)
-        page_count += 1
     await embed_pages(ctx, embed_list)
 
 def reminder_add_missing(ctx, pfx, bot):

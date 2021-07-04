@@ -32,10 +32,7 @@ hide_help = ['system', 'system pt', 'system fstop', 'system global_dm', 'evaluat
 def owner_check(ctx):
     with open(files.owners_loc(), 'r') as r:
         owner_list = json.load(r)
-    for owner in owner_list['DISCORD_IDS']:
-        if owner['id'] == ctx.message.author.id:
-            return True
-    return False
+    return any(owner['id'] == ctx.message.author.id for owner in owner_list['DISCORD_IDS'])
 
 def eval_check(ctx):
     with open(files.config_loc()) as c:
@@ -44,6 +41,4 @@ def eval_check(ctx):
     config.read_file(io.StringIO(discord_config))
     enable_eval = config.getboolean('python', 'enable_eval')
 
-    if ctx.message.author.id == 106188449643544576 and enable_eval:
-        return True
-    return False
+    return bool(ctx.message.author.id == 106188449643544576 and enable_eval)
