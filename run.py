@@ -370,9 +370,11 @@ async def reminder_wait(ctx, request = 1):
         rq_json = requests.retrieve_json(ctx.author.id, files.request_dir(), request)
         if rq_json['wait'] == True:
             rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'wait', False)
+            embed = embeds.reminder_wait_on(ctx, rq_new_json)
         else:
             rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'wait', True)
-        await ctx.send(embed=embeds.reminder_wait_success(ctx, rq_new_json))
+            embed = embeds.reminder_wait_off(ctx, rq_new_json)
+        await ctx.send(embed=embed)
     except IndexError:
         await ctx.send(embed=embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request))
 

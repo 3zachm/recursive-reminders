@@ -239,11 +239,21 @@ def reminder_move_missing(ctx, pfx, bot):
     )
     return embed
 
-def reminder_wait_success(ctx, rq_json):
+def reminder_wait_on(ctx, rq_json):
     user = ctx.message.author
     embed=discord.Embed(
         title="Your reminder has been toggled to wait  ✅",
         description="Reminder `" + rq_json["name"] + "` will wait for a reaction before counting down",
+        color=0x00CC66
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+def reminder_wait_off(ctx, rq_json):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="Your reminder now has wait toggled off  ✅",
+        description="Reminder `" + rq_json["name"] + "` will NOT wait for a reaction before counting down",
         color=0x00CC66
     )
     embed.set_footer(text=user.name, icon_url=user.avatar_url)
