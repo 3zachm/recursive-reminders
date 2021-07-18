@@ -397,9 +397,6 @@ async def timer_react(ctx, embed):
 
     if rq_continue:
         if rq_json["wait"] == True:
-            print(react_time)
-            print(discord.utils.snowflake_time(message.id))
-            print( react_time - discord.utils.snowflake_time(message.id))
             sub = (react_time - discord.utils.snowflake_time(message.id)).seconds
             requests.edit_json_val(rq_json["user"], files.request_dir(), rq_json['request'], 'added', sub)
         await ctx.send(embed=timer_continue(ctx, rq_json))
