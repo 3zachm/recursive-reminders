@@ -1,6 +1,7 @@
 import asyncio
 import json
 import discord
+import datetime
 import utils.utils as utils
 import utils.commands as cmds
 import utils.request_manager as requests
@@ -238,6 +239,28 @@ def reminder_move_missing(ctx, pfx, bot):
     )
     return embed
 
+def reminder_wait_success(ctx, rq_json):
+    user = ctx.message.author
+    embed=discord.Embed(
+        title="Your reminder has been toggled to wait  ✅",
+        description="Reminder `" + rq_json["name"] + "` will wait for a reaction before couting down",
+        color=0x00CC66
+    )
+    embed.set_footer(text=user.name, icon_url=user.avatar_url)
+    return embed
+
+def reminder_wait_missing(ctx, pfx, bot):
+    embed=discord.Embed(
+        title="Missing requirements!",
+    )
+    cmd = bot.get_command('reminder wait')
+    embed.add_field(
+        name=pfx + str(cmd) + " " + cmd.description,
+        value="Specify an ID to enable 'waiting', which can be found in the reminder list\nIf you have only one reminder, no ID is needed",
+        inline=False
+    )
+    return embed
+
 def reminder_stop_missing(ctx, pfx, bot):
     embed=discord.Embed(
         title="Missing requirements!",
@@ -333,9 +356,11 @@ async def timer_react(ctx, embed):
     try:
         if ctx.guild is not None:
             reaction, user = await bot.wait_for('reaction_add', timeout = t, check = check)
+            react_time = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
         else:
-            payload = await bot.wait_for('raw_reaction_add', timeout = 30.0, check = check_dm)
+            payload = await bot.wait_for('raw_reaction_add', timeout = t, check = check_dm)
             reaction, user = payload.emoji, payload.user_id
+            react_time = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
 
         if str(reaction) == '✅':
             rq_continue = True
@@ -361,6 +386,12 @@ async def timer_react(ctx, embed):
             return
 
     if rq_continue:
+        if rq_json["wait"] == True:
+            print(react_time)
+            print(discord.utils.snowflake_time(message.id))
+            print( react_time - discord.utils.snowflake_time(message.id))
+            sub = (react_time - discord.utils.snowflake_time(message.id)).seconds
+            requests.edit_json_val(rq_json["user"], files.request_dir(), rq_json['request'], 'added', sub)
         await ctx.send(embed=timer_continue(ctx, rq_json))
     await remove_reactions(ctx, message)
 

@@ -12,7 +12,7 @@ def create(ctx, loc, rqname, time):
     else:
         guild_name = ctx.guild.name
         channel = ctx.channel.id
-    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name, "channel": channel, "source": request}
+    data = {"user": userid, "request": request, "name": rqname, "time": time, "guild": guild_name, "channel": channel, "source": request, "wait": False, "added": 0}
     files.make_json(loc + str(userid) + '_' + str(request) + '.json', data) # ./id_rq.json
     return data
 

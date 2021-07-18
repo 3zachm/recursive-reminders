@@ -359,14 +359,33 @@ async def reminder_move(ctx, request):
     except IndexError:
         await ctx.send(embed=embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request))
 
+@reminder.command(name="wait", help=cmds.reminder_wait_help, description=cmds.reminder_wait_args)
+async def reminder_wait(ctx, request = 1):
+    try:
+        request = int(request)
+    except ValueError:
+        await ctx.send(embed=embeds.reminder_wait_missing(ctx))
+        return
+    try:
+        rq_json = requests.retrieve_json(ctx.author.id, files.request_dir(), request)
+        if rq_json['wait'] == True:
+            rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'wait', False)
+        else:
+            rq_new_json = requests.edit_json_val(rq_json['user'], files.request_dir(), rq_json['request'], 'wait', True)
+        await ctx.send(embed=embeds.reminder_wait_success(ctx, rq_new_json))
+    except IndexError:
+        await ctx.send(embed=embeds.reminder_cancel_index(ctx, guild_prefix(ctx), request))
+
 async def timer(ctx, rq_json):
     t = rq_json["time"]
     react = None
     while(True):
         await asyncio.sleep(t)
+        rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, rq_json['request'])
+        if rq_json["wait"] == True:
+            await asyncio.sleep(rq_json["added"])
         if react is not None:
             react.cancel()
-        rq_json = requests.retrieve_json_id(files.request_dir(), ctx.author.id, rq_json['request'])
         react = asyncio.create_task(embeds.timer_end(ctx, guild_prefix(ctx), rq_json))
 
 async def update_presence():
