@@ -2,7 +2,8 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/3zachm/recursive-reminders/badge)](https://www.codefactor.io/repository/github/3zachm/recursive-reminders) [![Maintainability](https://api.codeclimate.com/v1/badges/047a379134cb872d9743/maintainability)](https://codeclimate.com/github/3zachm/recursive-reminders/maintainability)
 
-Public invite [here](https://3zachm.dev/youmu/)!
+~~Public invite [here](https://3zachm.dev/youmu/)!~~
+Bot is too niche to rewrite with buttons on the discord.py library, so I'm no longer publicly hosting it
 
 Global default prefix is `!` but can be changed in generated config.
 
